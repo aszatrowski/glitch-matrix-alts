@@ -66,4 +66,4 @@ sim = xft.sim.Simulation(
 sim.run(4)
 
 cov = make_covariance_matrix(sim, maf = 0.01, include_pedigree=False)
-cov.to_csv("gcta_covariances.csv", index=False)
+cov.to_csv("data/gcta_covariances.csv", index=False)
