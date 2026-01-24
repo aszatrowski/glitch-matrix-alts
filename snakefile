@@ -11,6 +11,6 @@ rule all:
 
 rule sim:
     output: 
-        "data/covariances_{arch}.csv"
+        covariances_csv = "data/covariances_{arch}.csv"
     conda: "envs/shared-e-env.yaml"
     script: "scripts/sim.py"

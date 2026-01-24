@@ -5,7 +5,6 @@ channels:
   - defaults
 
 dependencies:
-  # --- Core Python + numerics (pin these: they're what kept you segfault-free) ---
   - python=3.10.13
   - numpy=1.23.5
   - scipy=1.14.1
@@ -14,18 +13,13 @@ dependencies:
   - numba=0.56.4
   - zarr=2.18.2
 
-  # --- Workflow + misc utilities ---
   - snakemake-minimal=7.32.4
   - pip=24.2
 
-  # --- R stack (kept minimal but functional for your scripts) ---
   - r-base=4.3.1
   - r-tidyverse=2.0.0
   - r-data.table=1.14.8
 
-  # you can add more R libs here if you know specific ones you need
-
-  # --- pip packages you explicitly installed / care about ---
   - pip:
       - xftsim==0.2.0
       - pandas-plink==2.3.1
@@ -37,4 +31,3 @@ dependencies:
       - dask-glm==0.3.2
       - numcodecs==0.13.1
       - xarray==2024.7.0
-      - zarr==2.18.2

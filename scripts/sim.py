@@ -3,7 +3,6 @@ from xftsim.reproduce import RecombinationMap
 from xftsim.sim import Simulation # import as own object
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from minimal_simulation_utils import make_covariance_matrix
 
@@ -40,7 +39,7 @@ founders, recomb = build_minimal_founders(
     chrom=1
 )
 # build minimal additive genetic + additive noise architecture
-if snakemake.input['arch'] == 'GCTA':
+if snakemake.wildcards['arch'] == 'GCTA':
     arch = xft.arch.GCTA_Architecture(
         h2=0.5,
         phenotype_name='Y',
@@ -67,4 +66,4 @@ sim = xft.sim.Simulation(
 sim.run(4)
 
 cov = make_covariance_matrix(sim, maf = 0.01, include_pedigree=False)
-cov.to_csv("data/gcta_covariances.csv", index=False)
+cov.to_csv(snakemake.output['covariances_csv'], index=False)

@@ -112,8 +112,6 @@ def make_covariance_matrix(
     # Extract and standardize phenotypes.
     pd_pheno = simulation.phenotypes.xft.as_pd()
     pd_pheno = pd_pheno.sort_index(axis=1)
-    print("pd_pheno:")
-    print(pd_pheno)
     # normalize phenotype values
     # use .loc to avoid chained indexing; chained indexing will break in pandas 3.0.
     # iterate over all phenotype components through hierarchical indexing
@@ -156,5 +154,4 @@ def make_covariance_matrix(
             on=["pedigree_id1", "pedigree_id2"],
             how="left",
         )
-
     return covariances
