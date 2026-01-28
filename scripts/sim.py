@@ -33,7 +33,7 @@ def build_minimal_founders(n_indivs: int, m_variants: int, min_af: float = 0.05,
 
 founders, recomb = build_minimal_founders(
     n_indivs=100,
-    m_variants=1_000,
+    m_variants=100,
     min_af=0.1,
     max_af=0.5,
     chrom=1
@@ -41,7 +41,7 @@ founders, recomb = build_minimal_founders(
 # build minimal additive genetic + additive noise architecture
 if snakemake.wildcards['arch'] == 'GCTA':
     arch = xft.arch.GCTA_Architecture(
-        h2=0.5,
+        h2=float(snakemake.wildcards['h2']),
         phenotype_name='Y',
         haplotypes=founders
     )
@@ -63,7 +63,13 @@ sim = xft.sim.Simulation(
     post_processors=post_processors
 )
 
-sim.run(4)
-
+print('Running generations...')
+sim.run(10)
+print('Complete.')
+    
+print('Building covariance matrix...')
 cov = make_covariance_matrix(sim, maf = 0.01, include_pedigree=False)
+print('Complete.')
+print('Writing covariance matrix...')
 cov.to_csv(snakemake.output['covariances_csv'], index=False)
+print('Complete.')

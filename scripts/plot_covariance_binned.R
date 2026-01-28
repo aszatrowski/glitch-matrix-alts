@@ -4,7 +4,8 @@ cov_df <- readr::read_csv(snakemake@input$covariances_csv) |>
   dplyr::mutate(
     gcov_bin = cut(
       Genetic_Covariance,
-      breaks = seq(min(Genetic_Covariance), max(Genetic_Covariance), by = 0.05),
+      # breaks = seq(min(Genetic_Covariance), max(Genetic_Covariance), by = 0.05),
+      breaks = c(-Inf, seq(-0.25, 0.25, by = 0.05), 0.5, 0.75, Inf),
       include.lowest = TRUE,
       ordered_result = TRUE
     )
@@ -21,6 +22,7 @@ p <- ggplot(cov_df, aes(x = gcov_bin, y = mean_y)) +
   geom_line() +
   labs(
     title = "Distribution of Y by Genetic Covariance Bins",
+    subtitle = paste("Arch:", snakemake@wildcards$arch),
     x = "Genetic Covariance",
     y = "Phenotypic Covariance"
   ) +
