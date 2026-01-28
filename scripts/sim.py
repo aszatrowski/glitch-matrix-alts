@@ -3,6 +3,7 @@ from xftsim.reproduce import RecombinationMap
 from xftsim.sim import Simulation # import as own object
 
 import numpy as np
+import random
 
 from minimal_simulation_utils import make_covariance_matrix
 
@@ -31,9 +32,10 @@ def build_minimal_founders(n_indivs: int, m_variants: int, min_af: float = 0.05,
     recomb = RecombinationMap.variable_map_from_haplotypes_with_cM(founders)
     return founders, recomb
 
+random.seed(1)
 founders, recomb = build_minimal_founders(
-    n_indivs=100,
-    m_variants=100,
+    n_indivs=1000,
+    m_variants=1000,
     min_af=0.1,
     max_af=0.5,
     chrom=1

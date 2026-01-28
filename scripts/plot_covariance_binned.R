@@ -19,7 +19,7 @@ cov_df <- readr::read_csv(snakemake@input$covariances_csv) |>
 
 p <- ggplot(cov_df, aes(x = gcov_bin, y = mean_y)) +
   geom_point() +
-  geom_line() +
+  geom_line(group = 1) +
   labs(
     title = "Distribution of Y by Genetic Covariance Bins",
     subtitle = paste("Arch:", snakemake@wildcards$arch),
