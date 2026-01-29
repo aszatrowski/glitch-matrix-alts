@@ -6,9 +6,35 @@ GRM construction and a covariance table builder for the final generation.
 """
 
 from __future__ import annotations
-
+import xftsim as xft
+from xftsim.reproduce import RecombinationMap
 import numpy as np
 import pandas as pd
+
+def build_minimal_founders(n_indivs: int, m_variants: int, min_af: float = 0.05, max_af: float = 0.5, chrom: int = 1):
+    """
+    Create founder haplotypes with uniform positions and a simple recomb map.
+    """
+    afs = np.random.uniform(min_af, max_af, size = m_variants)
+    founders = xft.founders.founder_haplotypes_from_AFs(n=n_indivs, afs=afs)
+
+    # 2 * m_variants
+    pos_len = founders["pos_bp"].shape[0]
+    # assign genomic positions
+    pos_bp = (np.arange(1, pos_len + 1) * 1000).astype(int)
+    # 1 cM (1/100 recombinations) for every 1M variants
+    pos_cM = pos_bp / 1_000_000
+
+    # assign positions and cM rates to founders
+    founders["pos_bp"].values = pos_bp
+    founders["pos_cM"].values = pos_cM
+    # repeat across chromosomes
+    founders["chrom"].values = np.repeat(chrom, pos_len)
+
+    # uniform recombination map consistent with these parameters.
+    # recomb is not immediately necessary, but is required for the actual xft.sim.Simulation
+    recomb = RecombinationMap.variable_map_from_haplotypes_with_cM(founders)
+    return founders, recomb
 
 
 def compute_grm(simulation, maf_min: float = 0.01) -> np.ndarray:

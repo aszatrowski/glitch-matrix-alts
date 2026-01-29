@@ -14,6 +14,9 @@ rule all:
 rule sim:
     output: 
         covariances_csv = "data/covariances_{arch}_{h2}.csv"
+    params:
+        n_indivs = 1000,
+        m_variants = 1000
     conda: "envs/shared-e-env.yaml"
     script: "scripts/sim.py"
 
