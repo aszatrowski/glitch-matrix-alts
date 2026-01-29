@@ -25,7 +25,7 @@ rule plot_pheno_covariance_binned:
         covariances_csv = "data/covariances_{arch}_{h2}.csv"
     output: 
         covariance_plot = "figures/covariance_{arch}_{h2}_binned.png"
-    conda: "envs/shared-e-env.yaml"
+    conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_binned.R"
 
 rule plot_pheno_covariance_all:
@@ -33,5 +33,5 @@ rule plot_pheno_covariance_all:
         covariances_csv = "data/covariances_{arch}_{h2}.csv"
     output: 
         covariance_plot = "figures/covariance_{arch}_{h2}_all.png",
-    conda: "envs/shared-e-env.yaml"
+    conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_all.R"
