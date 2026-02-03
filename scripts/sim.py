@@ -16,12 +16,11 @@ founders, recomb = build_minimal_founders(
     chrom=1
 )
 # build minimal additive genetic + additive noise architecture
-if snakemake.wildcards['arch'] == 'GCTA':
-    arch = xft.arch.GCTA_Architecture(
-        h2=float(snakemake.wildcards['h2']),
-        phenotype_name='Y',
-        haplotypes=founders
-    )
+arch = xft.arch.GCTA_Architecture(
+    h2=float(snakemake.wildcards['h2']),
+    phenotype_name='Y',
+    haplotypes=founders
+)
 
 mating_regime = xft.mate.RandomMatingRegime(
     mates_per_female=1,

@@ -61,7 +61,7 @@ def additive_effects_freq(founder_haplotypes, n_causal = None, w = 1, h2 = 0):
     print(f"Done deciding effect sizes.")
     return([effects,causal_sites])
 
-def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n_causal = None,w=0):
+def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n_causal = None, w=0):
     """
     Function to set up VCT architecture. source: Marida, entirely.
     """
@@ -72,7 +72,7 @@ def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n
         print(f"Paternal variance is {b2p} and maternal variance is {b2m}.")
 
     # Make genetic component.
-    effects,causal_sites = additive_effects_freq(founder_haplotypes, n_causal = n_causal,h2 = 0.5, w=w)
+    effects,causal_sites = additive_effects_freq(founder_haplotypes, n_causal = n_causal, h2 = h2, w=w)
     print("Now making architecture...")
     a_comp = xft.arch.AdditiveGeneticComponent(beta=effects,  component_name="additiveGenetic")
     # making the vertical component
@@ -118,6 +118,27 @@ def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n
                                     strans])
     print("Done making architecture.")
     return([arch,causal_sites])
+
+if snakemake.wildcards['h2'] + snakemake.wildcards['b2'] >= 1.0:
+    raise ValueError("Require h2 + b2 < 1.0.")
+
+# Pick a small causal set for this minimal example.
+n_causal = snakemake.params['n_causal']
+if n_causal is None:
+    n_causal = max(5, snakemake.params['m_variants'] // 20)
+if n_causal >= max(1, snakemake.params['m_variants'] // 10):
+    n_causal = max(5, snakemake.params['m_variants'] // 20)
+    print(f"[note] lowering n_causal to {n_causal} for this minimal demo.")
+
+arch, _ = vct_architecture(
+    founders,
+    h2=snakemake.wildcards['h2'],
+    b2=snakemake.wildcards['b2'],
+    parental_coeff=0.5,
+    n=int(snakemake.params['n_indivs']),
+    n_causal=100,
+    w=0,
+)
 
 mating_regime = xft.mate.RandomMatingRegime(
     mates_per_female=1,
