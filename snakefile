@@ -1,19 +1,28 @@
+# Define your grid
+h2_VALUES = [0.001, 0.25, 0.5, 1]
+b2_VALUES = [0.0, 0.25, 0.5, 1]
+
+def get_valid_combinations():
+    valid = []
+    for h2 in h2_VALUES:
+        for b2 in b2_VALUES:
+            if h2 + b2 <= 1.0:  # Ensure environmental component is non-negative
+                valid.append((h2, b2))
+    return valid
+
+def get_all_outputs_vct():
+    outputs = []
+    for h2, b2 in get_valid_combinations():
+        outputs.append(f"figures/vct/covariances_h2_{h2}_b2_{b2}.png")
+    return outputs
+
 rule all:
     input: 
         expand(
             "data/gcta/covariances_{h2}.csv",
             h2 = [0.5, 1],
         ),
-        expand(
-            "figures/covariance_vct_{h2}_{b2}.png",
-            h2 = [0.001, 0.5, 1],
-            b2 = [0.1, 0.25]
-        ),
-        # expand(
-        #     "figures/covariance_vct_{h2}_{b2}_binned.png",
-        #     h2 = [0.5, 1],
-        #     b2 = [0, 0.25]
-        # )
+        get_all_outputs_vct()
 
 rule sim_gcta:
     output: 
@@ -26,29 +35,32 @@ rule sim_gcta:
 
 rule sim_vct:
     output: 
-        covariances_csv = "data/vct/covariances_{h2}_{b2}.csv"
+        covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}.csv"
     params:
-        n_indivs = 1000,
-        m_variants = 1000,
-        n_causal = 50
+        n_indivs = 100,
+        m_variants = 500,
+        n_causal = 100
+    log:
+        "logs/vct/covariances_h2_{h2}_b2_{b2}.log"
     conda: "envs/shared-e-env.yaml"
-    script: "scripts/sim.py"
+    script:
+        "scripts/sim_vct.py" 
 
-rule plot_pheno_covariance_gcta_binned:
-    input: 
-        covariances_csv = "data/covariances_gcta_{h2}.csv"
-    output: 
-        covariance_plot = "figures/covariance_gcta_{h2}_binned.png"
-    conda: "envs/r-tools.yaml"
-    script: "scripts/plot_covariance_binned.R"
+# rule plot_pheno_covariance_gcta_binned:
+#     input: 
+#         covariances_csv = "data/covariances_gcta_{h2}.csv"
+#     output: 
+#         covariance_plot = "figures/covariance_gcta_{h2}_binned.png"
+#     conda: "envs/r-tools.yaml"
+#     script: "scripts/plot_covariance_binned.R"
 
-rule plot_pheno_covariance_gcta_all:
-    input: 
-        covariances_csv = "data/covariances_gcta_{h2}.csv"
-    output: 
-        covariance_plot = "figures/covariance_gcta_{h2}_all.png",
-    conda: "envs/r-tools.yaml"
-    script: "scripts/plot_covariance_all.R"
+# rule plot_pheno_covariance_gcta_all:
+#     input: 
+#         covariances_csv = "data/covariances_gcta_{h2}.csv"
+#     output: 
+#         covariance_plot = "figures/covariance_gcta_{h2}_all.png",
+#     conda: "envs/r-tools.yaml"
+#     script: "scripts/plot_covariance_all.R"
 
 rule plot_pheno_covariance_vct_binned:
     input: 
@@ -60,8 +72,8 @@ rule plot_pheno_covariance_vct_binned:
 
 rule plot_pheno_covariance_vct_all:
     input: 
-        covariances_csv = "data/vct/covariances_{h2}_{b2}.csv"
+        covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}.csv"
     output: 
-        covariance_plot = "figures/covariance_vct_{h2}_{b2}.png",
+        covariance_plot = "figures/vct/covariances_h2_{h2}_b2_{b2}.png",
     conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_all.R"

@@ -1,3 +1,9 @@
+# Redirect stdout/stderr to log file
+import sys
+log_file = snakemake.log[0]
+sys.stdout = open(log_file, 'w')
+sys.stderr = sys.stdout
+
 import xftsim as xft
 from xftsim.reproduce import RecombinationMap
 from xftsim.sim import Simulation # import as own object
@@ -8,9 +14,19 @@ import random
 from minimal_simulation_utils import make_covariance_matrix, build_minimal_founders
 
 random.seed(1)
+# import simulation parameters from snakemake environment object; make sure all are float or int
+n_indivs=int(snakemake.params['n_indivs'])
+n_causal = int(snakemake.params['n_causal'])
+m_variants = int(snakemake.params['m_variants'])
+
+h2=float(snakemake.wildcards['h2'])
+b2=float(snakemake.wildcards['b2'])
+
+print(f"n_indivs={n_indivs}, n_causal={n_causal}, m_variants={m_variants}, h2={h2}, b2={b2}")
+
 founders, recomb = build_minimal_founders(
-    n_indivs=int(snakemake.params['n_indivs']),
-    m_variants=int(snakemake.params['m_variants']),
+    n_indivs=n_indivs,
+    m_variants=m_variants,
     min_af=0.1,
     max_af=0.5,
     chrom=1
@@ -41,7 +57,7 @@ def additive_effects_freq(founder_haplotypes, n_causal = None, w = 1, h2 = 0):
         p = weights / weights.sum()
         causal_sites = np.random.choice(subset, n_causal, replace=False, p=p)
     else:
-        weights = (1 - subset_maf) ** w
+        weights = (1 - m_allele_freqs) ** w # FIXED: used to be subset_maf instead of m_allele_freqs, which is only assigned in the if: block
         p = weights / weights.sum()
         causal_sites = np.random.choice(np.arange(m), n_causal, replace=False, p=p)
 
@@ -119,24 +135,25 @@ def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n
     print("Done making architecture.")
     return([arch,causal_sites])
 
-if snakemake.wildcards['h2'] + snakemake.wildcards['b2'] >= 1.0:
-    raise ValueError("Require h2 + b2 < 1.0.")
+if h2 + b2 > 1.0:
+    raise ValueError("Require h2 + b2 <= 1.0.")
 
 # Pick a small causal set for this minimal example.
-n_causal = snakemake.params['n_causal']
-if n_causal is None:
-    n_causal = max(5, snakemake.params['m_variants'] // 20)
-if n_causal >= max(1, snakemake.params['m_variants'] // 10):
-    n_causal = max(5, snakemake.params['m_variants'] // 20)
-    print(f"[note] lowering n_causal to {n_causal} for this minimal demo.")
+
+# if n_causal is None:
+#     n_causal = max(5, m_variants // 20)
+# if n_causal >= max(1, m_variants // 10):
+#     n_causal = max(5, m_variants // 20)
+#     print(f"[note] lowering n_causal to {n_causal} for this minimal demo.")
+
 
 arch, _ = vct_architecture(
     founders,
-    h2=snakemake.wildcards['h2'],
-    b2=snakemake.wildcards['b2'],
+    h2=h2,
+    b2=b2,
     parental_coeff=0.5,
-    n=int(snakemake.params['n_indivs']),
-    n_causal=100,
+    n=n_indivs,
+    n_causal=n_causal,
     w=0,
 )
 
@@ -158,8 +175,9 @@ sim = xft.sim.Simulation(
 )
 
 print('Running generations...')
-sim.run(10)
+sim.run(1)
 print('Complete.')
+print(sim)
     
 print('Building covariance matrix...')
 cov = make_covariance_matrix(sim, maf = 0.01, include_pedigree=False)

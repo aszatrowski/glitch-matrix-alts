@@ -2,4 +2,5 @@
 .vscode
 .DS_Store
 data/
+logs/
 scripts/__pycache__

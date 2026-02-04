@@ -143,8 +143,10 @@ def make_covariance_matrix(
     # iterate over all phenotype components through hierarchical indexing
     for pheno in pd_pheno.columns.get_level_values('phenotype_name').unique():
         for comp in pd_pheno.columns.get_level_values('component_name').unique():
-            col = (pheno, comp, slice(None))
-            pd_pheno.loc[:, col] = (pd_pheno.loc[:, col] - pd_pheno.loc[:, col].mean()) / pd_pheno.loc[:, col].std()
+            mask = (pd_pheno.columns.get_level_values('phenotype_name') == pheno) & \
+                   (pd_pheno.columns.get_level_values('component_name') == comp)
+            if mask.any():
+                pd_pheno.loc[:, mask] = (pd_pheno.loc[:, mask] - pd_pheno.loc[:, mask].mean()) / pd_pheno.loc[:, mask].std()
     # GRM for genetic covariance.
     grm = compute_grm(simulation, maf_min=maf)
 
