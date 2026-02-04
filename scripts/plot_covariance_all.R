@@ -6,11 +6,13 @@ cov_df <- readr::read_csv(snakemake@input$covariances_csv, show_col_types = FALS
 he_regression <- lm(Y ~ Genetic_Covariance, data = cov_df)
 he_est <- round(coef(he_regression)[2], 3)
 he_label <- bquote(h^2[HE] == .(round(he_est, 3)))
+title_text <- bquote(h^2 == .(snakemake@wildcards$h2) ~ b^2 == .(snakemake@wildcards$b2))
+
 p <- ggplot(cov_df, aes(x = Genetic_Covariance, y = Y)) +
   geom_point() +
   geom_smooth(method = "lm", se = TRUE, color = "blue") +
   labs(
-    title = "Phenotypic Covariance vs Genetic Covariance",
+    title = title_text,
     subtitle = bquote(h[HE]^2 == .(round(he_est, 3))),
     x = "Genetic Covariance",
     y = "Phenotypic Covariance"
