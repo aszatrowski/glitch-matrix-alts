@@ -13,7 +13,7 @@ import random
 
 from minimal_simulation_utils import make_covariance_matrix, build_minimal_founders
 
-random.seed(1)
+random.seed(int(snakemake.wildcards['rep'])) # ensure each replicate is different yet individually reproducible
 # import simulation parameters from snakemake environment object; make sure all are float or int
 n_indivs=int(snakemake.params['n_indivs'])
 n_causal = int(snakemake.params['n_causal'])

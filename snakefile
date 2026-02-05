@@ -1,5 +1,6 @@
-h2_VALUES = [0.001, 0.25, 0.5, 1]
-b2_VALUES = [0.0, 0.25, 0.5, 1]
+h2_VALUES = [0.001, 0.5, 1]
+b2_VALUES = [0.0, 0.5, 1]
+N_REPLICATES = 2
 
 def get_valid_combinations():
     valid = []
@@ -12,8 +13,9 @@ def get_valid_combinations():
 def get_all_outputs_vct():
     outputs = []
     for h2, b2 in get_valid_combinations():
-        outputs.append(f"figures/vct/covariances_h2_{h2}_b2_{b2}.png")
-        outputs.append(f"figures/vct/covariances_binned_h2_{h2}_b2_{b2}.png")
+        for rep in range(N_REPLICATES):
+            outputs.append(f"data/vct/covariances_h2_{h2}_b2_{b2}_rep{rep}.csv")
+            # outputs.append(f"figures/vct/covariances_binned_h2_{h2}_b2_{b2}_rep{rep}.png")
     return outputs
 
 rule all:
@@ -22,29 +24,37 @@ rule all:
 
 rule sim_vct:
     output: 
-        covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}.csv"
+        covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}_rep{rep}.csv"
     params:
         n_indivs = 1000,
         m_variants = 500,
         n_causal = 100
     log:
-        "logs/vct/covariances_h2_{h2}_b2_{b2}.log"
+        "logs/vct/covariances_h2_{h2}_b2_{b2}_rep{rep}.log"
     conda: "envs/shared-e-env.yaml"
     script:
         "scripts/sim_vct.py" 
 
-rule plot_pheno_covariance_binned:
-    input: 
-        covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
-    output: 
-        covariance_plot = "figures/{arch}/covariances_binned_h2_{h2}_b2_{b2}.png",
+rule merge_replicates:
+    input:
+        expand("results/sim_{{params}}_rep{rep}.csv", rep=range(N_REPLICATES))
+    output:
+        "results/sim_{params}_merged.csv"
     conda: "envs/r-tools.yaml"
-    script: "scripts/plot_covariance_binned.R"
+    script: "scripts/merge_replicates.R"
 
-rule plot_pheno_covariance_all:
-    input: 
-        covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
-    output: 
-        covariance_plot = "figures/{arch}/covariances_h2_{h2}_b2_{b2}.png",
-    conda: "envs/r-tools.yaml"
-    script: "scripts/plot_covariance_all.R"
+# rule plot_pheno_covariance_binned:
+#     input: 
+#         covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
+#     output: 
+#         covariance_plot = "figures/{arch}/covariances_binned_h2_{h2}_b2_{b2}.png",
+#     conda: "envs/r-tools.yaml"
+#     script: "scripts/plot_covariance_binned.R"
+
+# rule plot_pheno_covariance_all:
+#     input: 
+#         covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
+#     output: 
+#         covariance_plot = "figures/{arch}/covariances_h2_{h2}_b2_{b2}.png",
+#     conda: "envs/r-tools.yaml"
+#     script: "scripts/plot_covariance_all.R"
