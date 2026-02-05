@@ -175,7 +175,7 @@ sim = xft.sim.Simulation(
 )
 
 print('Running generations...')
-sim.run(1)
+sim.run(5)
 print('Complete.')
 print(sim)
     

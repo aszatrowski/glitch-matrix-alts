@@ -14,6 +14,7 @@ def get_all_outputs_vct():
     outputs = []
     for h2, b2 in get_valid_combinations():
         outputs.append(f"figures/vct/covariances_h2_{h2}_b2_{b2}.png")
+        outputs.append(f"figures/vct/covariances_binned_h2_{h2}_b2_{b2}.png")
     return outputs
 
 rule all:
@@ -46,34 +47,18 @@ rule sim_vct:
     script:
         "scripts/sim_vct.py" 
 
-# rule plot_pheno_covariance_gcta_binned:
-#     input: 
-#         covariances_csv = "data/covariances_gcta_{h2}.csv"
-#     output: 
-#         covariance_plot = "figures/covariance_gcta_{h2}_binned.png"
-#     conda: "envs/r-tools.yaml"
-#     script: "scripts/plot_covariance_binned.R"
-
-# rule plot_pheno_covariance_gcta_all:
-#     input: 
-#         covariances_csv = "data/covariances_gcta_{h2}.csv"
-#     output: 
-#         covariance_plot = "figures/covariance_gcta_{h2}_all.png",
-#     conda: "envs/r-tools.yaml"
-#     script: "scripts/plot_covariance_all.R"
-
-rule plot_pheno_covariance_vct_binned:
+rule plot_pheno_covariance_binned:
     input: 
-        covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}.csv"
+        covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
     output: 
-        covariance_plot = "figures/vct/covariances_binned_h2_{h2}_b2_{b2}.png",
+        covariance_plot = "figures/{arch}/covariances_binned_h2_{h2}_b2_{b2}.png",
     conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_binned.R"
 
-rule plot_pheno_covariance_vct_all:
+rule plot_pheno_covariance_all:
     input: 
-        covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}.csv"
+        covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
     output: 
-        covariance_plot = "figures/vct/covariances_h2_{h2}_b2_{b2}.png",
+        covariance_plot = "figures/{arch}/covariances_h2_{h2}_b2_{b2}.png",
     conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_all.R"

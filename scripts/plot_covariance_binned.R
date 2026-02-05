@@ -6,11 +6,12 @@ cov_df <- readr::read_csv(snakemake@input$covariances_csv, show_col_types = FALS
   dplyr::mutate(n=n()) |>
   dplyr::summarize(across(-contains("id"), function(x) mean(x, na.rm=TRUE)))
 
+title_text <- bquote(h^2 == .(snakemake@wildcards$h2) ~ b^2 == .(snakemake@wildcards$b2))
 p <- ggplot(cov_df, aes(x = Genetic_Covariance, y = Y)) +
   geom_point() +
   labs(
-    title = "Distribution of Y by Genetic Covariance Bins",
-    subtitle = paste("Arch:", snakemake@wildcards$arch),
+    title = title_text,
+    subtitle = "Arch: VCT",
     x = "Genetic Covariance",
     y = "Phenotypic Covariance"
   ) +
