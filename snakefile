@@ -1,5 +1,7 @@
-h2_VALUES = [0.001, 0.5, 1]
-b2_VALUES = [0.0, 0.5, 1]
+# h2_VALUES = [0.001, 0.5, 1]
+# b2_VALUES = [0.0, 0.5, 1]
+h2_VALUES = [0.001]
+b2_VALUES = [0.5]
 N_REPLICATES = 2
 
 def get_valid_combinations():
@@ -14,7 +16,7 @@ def get_all_outputs_vct():
     outputs = []
     for h2, b2 in get_valid_combinations():
         for rep in range(N_REPLICATES):
-            outputs.append(f"data/vct/covariances_h2_{h2}_b2_{b2}_rep{rep}.csv")
+            outputs.append(f"data/vct/covariances_h2_{h2}_b2_{b2}_merged.csv")
             # outputs.append(f"figures/vct/covariances_binned_h2_{h2}_b2_{b2}_rep{rep}.png")
     return outputs
 
@@ -37,9 +39,9 @@ rule sim_vct:
 
 rule merge_replicates:
     input:
-        expand("results/sim_{{params}}_rep{rep}.csv", rep=range(N_REPLICATES))
+        replicates = expand("data/vct/covariances_{{params}}_rep{rep}.csv", rep=range(N_REPLICATES))
     output:
-        "results/sim_{params}_merged.csv"
+        merged_replicates = "data/vct/covariances_{params}_merged.csv"
     conda: "envs/r-tools.yaml"
     script: "scripts/merge_replicates.R"
 
