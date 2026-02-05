@@ -7,13 +7,15 @@ for (i in seq_along(replicates)) {
   # Posted by akrun, modified by community. See post 'Timeline' for change history
   # Retrieved 2026-02-05, License - CC BY-SA 4.0
   # Source - https://stackoverflow.com/a/64188680
-  replicates[[i]] <- dplyr::rename_with(
-    replicates[[i]],
-    ~ paste(., "rep", i - 1, sep = "_"),  # 0-indexed to match your rep wildcard
-    !c("pedigree_id1", "pedigree_id2"), # columns to exclude from renaming
-  )
+  replicates[[i]] <- replicates[[i]] |>
+    dplyr::mutate(rep = i - 1)
 }
-
-merged_replicates <- purrr::reduce(replicates, dplyr::full_join, by = c("pedigree_id1", "pedigree_id2"))
-print(snakemake@output[["merged_replicates"]])
+merged_replicates <- dplyr::bind_rows(replicates) |>
+  dplyr::select(pedigree_id1, pedigree_id2, Y, Genetic_Covariance) |>
+  dplyr::group_by(pedigree_id1, pedigree_id2) |>
+  dplyr::summarize(
+    dplyr::across(c(Y, Genetic_Covariance), \(x) mean(x, na.rm = TRUE)),
+    .groups = "drop"
+  )
+  
 readr::write_csv(merged_replicates, snakemake@output[["merged_replicates"]])

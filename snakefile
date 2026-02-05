@@ -1,7 +1,5 @@
-# h2_VALUES = [0.001, 0.5, 1]
-# b2_VALUES = [0.0, 0.5, 1]
-h2_VALUES = [0.001]
-b2_VALUES = [0.5]
+h2_VALUES = [0.001, 0.5, 1]
+b2_VALUES = [0.0, 0.5, 1]
 N_REPLICATES = 2
 
 def get_valid_combinations():
@@ -16,8 +14,8 @@ def get_all_outputs_vct():
     outputs = []
     for h2, b2 in get_valid_combinations():
         for rep in range(N_REPLICATES):
-            outputs.append(f"data/vct/covariances_h2_{h2}_b2_{b2}_merged.csv")
-            # outputs.append(f"figures/vct/covariances_binned_h2_{h2}_b2_{b2}_rep{rep}.png")
+            outputs.append(f"figures/vct/covariances_h2_{h2}_b2_{b2}.png")
+            outputs.append(f"figures/vct/covariances_binned_h2_{h2}_b2_{b2}.png")
     return outputs
 
 rule all:
@@ -45,18 +43,18 @@ rule merge_replicates:
     conda: "envs/r-tools.yaml"
     script: "scripts/merge_replicates.R"
 
-# rule plot_pheno_covariance_binned:
-#     input: 
-#         covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
-#     output: 
-#         covariance_plot = "figures/{arch}/covariances_binned_h2_{h2}_b2_{b2}.png",
-#     conda: "envs/r-tools.yaml"
-#     script: "scripts/plot_covariance_binned.R"
+rule plot_pheno_covariance_binned:
+    input: 
+        covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}_merged.csv"
+    output: 
+        covariance_plot = "figures/{arch}/covariances_binned_h2_{h2}_b2_{b2}.png",
+    conda: "envs/r-tools.yaml"
+    script: "scripts/plot_covariance_binned.R"
 
-# rule plot_pheno_covariance_all:
-#     input: 
-#         covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}.csv"
-#     output: 
-#         covariance_plot = "figures/{arch}/covariances_h2_{h2}_b2_{b2}.png",
-#     conda: "envs/r-tools.yaml"
-#     script: "scripts/plot_covariance_all.R"
+rule plot_pheno_covariance_all:
+    input: 
+        covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}_merged.csv"
+    output: 
+        covariance_plot = "figures/{arch}/covariances_h2_{h2}_b2_{b2}.png",
+    conda: "envs/r-tools.yaml"
+    script: "scripts/plot_covariance_all.R"
