@@ -37,7 +37,7 @@ rule sim_vct:
     output: 
         covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}.csv"
     params:
-        n_indivs = 100,
+        n_indivs = 1000,
         m_variants = 500,
         n_causal = 100
     log:
@@ -64,9 +64,9 @@ rule sim_vct:
 
 rule plot_pheno_covariance_vct_binned:
     input: 
-        covariances_csv = "data/vct/covariances_{h2}_{b2}.csv"
+        covariances_csv = "data/vct/covariances_h2_{h2}_b2_{b2}.csv"
     output: 
-        covariance_plot = "figures/covariance_vct_{h2}_{b2}_binned.png"
+        covariance_plot = "figures/vct/covariances_binned_h2_{h2}_b2_{b2}.png",
     conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_binned.R"
 
