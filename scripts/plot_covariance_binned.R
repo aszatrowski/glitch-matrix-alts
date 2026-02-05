@@ -11,7 +11,7 @@ p <- ggplot(cov_df, aes(x = Genetic_Covariance, y = Y)) +
   geom_point() +
   labs(
     title = title_text,
-    subtitle = "Arch: VCT",
+    subtitle = paste("Arch:", snakemake@wildcards$arch),
     x = "Genetic Covariance",
     y = "Phenotypic Covariance"
   ) +

@@ -13,7 +13,9 @@ p <- ggplot(cov_df, aes(x = Genetic_Covariance, y = Y)) +
   geom_smooth(method = "lm", se = TRUE, color = "blue") +
   labs(
     title = title_text,
-    subtitle = bquote(h[HE]^2 == .(round(he_est, 3))),
+    subtitle = bquote(
+      .(paste("Arch:", snakemake@wildcards$arch)) ~ h[HE]^2 == .(round(he_est, 3))
+    ),
     x = "Genetic Covariance",
     y = "Phenotypic Covariance"
   )

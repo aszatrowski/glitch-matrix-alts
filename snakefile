@@ -1,4 +1,3 @@
-# Define your grid
 h2_VALUES = [0.001, 0.25, 0.5, 1]
 b2_VALUES = [0.0, 0.25, 0.5, 1]
 
@@ -19,20 +18,7 @@ def get_all_outputs_vct():
 
 rule all:
     input: 
-        expand(
-            "data/gcta/covariances_{h2}.csv",
-            h2 = [0.5, 1],
-        ),
         get_all_outputs_vct()
-
-rule sim_gcta:
-    output: 
-        covariances_csv = "data/gcta/covariances_{h2}.csv"
-    params:
-        n_indivs = 1000,
-        m_variants = 1000
-    conda: "envs/shared-e-env.yaml"
-    script: "scripts/sim.py"
 
 rule sim_vct:
     output: 
