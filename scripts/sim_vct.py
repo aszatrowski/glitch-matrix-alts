@@ -22,7 +22,7 @@ m_variants = int(snakemake.params['m_variants'])
 h2=float(snakemake.wildcards['h2'])
 b2=float(snakemake.wildcards['b2'])
 
-print(f"n_indivs={n_indivs}, n_causal={n_causal}, m_variants={m_variants}, h2={h2}, b2={b2}")
+print(f"n_indivs={n_indivs}, n_causal={n_causal}, m_variants={m_variants}, h2={h2}, b2={b2}, rep/seed={int(snakemake.wildcards['rep'])}")
 
 founders, recomb = build_minimal_founders(
     n_indivs=n_indivs,

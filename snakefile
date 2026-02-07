@@ -1,6 +1,6 @@
 h2_VALUES = [0.001, 0.5, 1]
-b2_VALUES = [0.0, 0.25, 0.5, 1]
-N_REPLICATES = 20
+b2_VALUES = [0.0, 0.5, 1]
+N_REPLICATES = 2
 
 def get_valid_combinations():
     valid = []
@@ -47,6 +47,9 @@ rule plot_pheno_covariance_binned:
         covariances_csv = "data/{arch}/covariances_h2_{h2}_b2_{b2}_merged.csv"
     output: 
         covariance_plot = "figures/{arch}/covariances_binned_h2_{h2}_b2_{b2}.png",
+    params:
+        binwidth = 0.05,
+        min_obs_in_bin = 5
     conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_binned.R"
 
