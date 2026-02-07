@@ -1,6 +1,6 @@
 h2_VALUES = [0.001, 0.5, 1]
 b2_VALUES = [0.0, 0.5, 1]
-N_REPLICATES = 4
+N_REPLICATES = 10
 
 def get_valid_combinations():
     valid = []
