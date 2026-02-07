@@ -1,5 +1,5 @@
 h2_VALUES = [0.001, 0.5, 1]
-b2_VALUES = [0.0, 0.5, 1]
+b2_VALUES = [0.0, 0.25, 0.5, 1]
 N_REPLICATES = 20
 
 def get_valid_combinations():
@@ -31,9 +31,8 @@ rule sim_vct:
         n_causal = 100
     log:
         "logs/vct/covariances_h2_{h2}_b2_{b2}_rep{rep}.log"
-    conda: "envs/shared-e-env.yaml"
-    script:
-        "scripts/sim_vct.py" 
+    conda: "envs/xftsim.yaml"
+    script: "scripts/sim_vct.py" 
 
 rule merge_replicates:
     input:
