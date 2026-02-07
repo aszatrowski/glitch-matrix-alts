@@ -1,6 +1,6 @@
 h2_VALUES = [0.001, 0.5, 1]
 b2_VALUES = [0.0, 0.5, 1]
-N_REPLICATES = 2
+N_REPLICATES = 4
 
 def get_valid_combinations():
     valid = []
@@ -28,7 +28,7 @@ rule sim_vct:
     params:
         n_indivs = 1000,
         m_variants = 500,
-        n_causal = 100
+        n_causal = 200
     log:
         "logs/vct/covariances_h2_{h2}_b2_{b2}_rep{rep}.log"
     conda: "envs/xftsim.yaml"

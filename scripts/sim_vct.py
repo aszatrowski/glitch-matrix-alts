@@ -138,15 +138,6 @@ def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n
 if h2 + b2 > 1.0:
     raise ValueError("Require h2 + b2 <= 1.0.")
 
-# Pick a small causal set for this minimal example.
-
-# if n_causal is None:
-#     n_causal = max(5, m_variants // 20)
-# if n_causal >= max(1, m_variants // 10):
-#     n_causal = max(5, m_variants // 20)
-#     print(f"[note] lowering n_causal to {n_causal} for this minimal demo.")
-
-
 arch, _ = vct_architecture(
     founders,
     h2=h2,
