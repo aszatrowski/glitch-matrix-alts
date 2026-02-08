@@ -4,9 +4,6 @@ library(dplyr)
 replicates <- purrr::map(snakemake@input[["replicates"]], readr::read_csv, show_col_types = FALSE)
 for (i in seq_along(replicates)) {
   # append replicate identifier to all columns except pedigree_id1 and pedigree_id2
-  # Posted by akrun, modified by community. See post 'Timeline' for change history
-  # Retrieved 2026-02-05, License - CC BY-SA 4.0
-  # Source - https://stackoverflow.com/a/64188680
   replicates[[i]] <- replicates[[i]] |>
     dplyr::mutate(rep = i - 1)
 }
