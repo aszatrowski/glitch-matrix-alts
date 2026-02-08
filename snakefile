@@ -49,7 +49,7 @@ rule plot_pheno_covariance_binned:
     output: 
         covariance_plot = "figures/{arch}/h2_{h2}_b2_{b2}_binned.png",
     params:
-        binwidth = 0.05,
+        binwidth = 0.01,
         min_obs_in_bin = 5
     conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_binned.R"
