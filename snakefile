@@ -1,6 +1,6 @@
 h2_VALUES = [0.001, 0.5, 1]
 b2_VALUES = [0.0, 0.25, 0.5, 0.75, 1]
-N_REPLICATES = 25
+N_REPLICATES = 40
 
 def get_valid_combinations():
     valid = []
@@ -26,7 +26,7 @@ rule sim_vct:
     output: 
         covariances_csv = temp("data/vct/h2_{h2}_b2_{b2}_rep{rep}_covmatrix.csv")
     params:
-        n_indivs = 1000,
+        n_indivs = 1200,
         m_variants = 300,
         n_causal = 200,
         generations = 10
