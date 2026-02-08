@@ -53,9 +53,14 @@ def compute_grm(simulation, maf_min: float = 0.01) -> np.ndarray:
     var = np.nanvar(geno, axis=0)
     var_mask = (var > 0) & ~np.isnan(var)
     geno = geno[:, var_mask]
-
-    return np.cov(geno)
-
+    
+    geno_centered = geno - np.nanmean(geno, axis=0)
+    
+    # direct GRM computation
+    m = geno_centered.shape[1]
+    grm = (geno_centered @ geno_centered.T) / m
+    
+    return grm
 
 def get_pedigree_distance(sim, maximum_depth=None) -> pd.DataFrame:
     """
@@ -151,7 +156,8 @@ def make_covariance_matrix(
     grm = compute_grm(simulation, maf_min=maf)
 
     # Phenotype-related covariance matrices.
-    pcov = pd_pheno.loc[:, ('Y', 'phenotype')] @ pd_pheno.loc[:, ('Y', 'phenotype')].T
+    y_vals = pd_pheno.loc[:, ('Y', 'phenotype')].values
+    pcov = y_vals @ y_vals.T
 
     # Upper-triangle entries (including diagonal).
     num_individuals = len(ids)
@@ -165,7 +171,7 @@ def make_covariance_matrix(
     data = {
         "pedigree_id1": [pair[0] for pair in individual_pairs],
         "pedigree_id2": [pair[1] for pair in individual_pairs],
-        "Y": pcov.values[tri_idx],
+        "Y": pcov[tri_idx],
         "Genetic_Covariance": grm[tri_idx],
     }
 

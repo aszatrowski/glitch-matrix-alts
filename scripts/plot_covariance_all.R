@@ -9,7 +9,7 @@ he_label <- bquote(h^2[HE] == .(round(he_est, 3)))
 title_text <- bquote(h^2 == .(snakemake@wildcards$h2) ~ b^2 == .(snakemake@wildcards$b2))
 
 p <- ggplot(cov_df, aes(x = Genetic_Covariance, y = Y)) +
-  geom_point() +
+  geom_point(alpha = 0.5, size = 0.75) +
   geom_smooth(method = "lm", se = TRUE, color = "blue") +
   labs(
     title = title_text,

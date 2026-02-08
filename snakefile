@@ -1,6 +1,6 @@
 h2_VALUES = [0.001, 0.5, 1]
 b2_VALUES = [0.0, 0.25, 0.5, 0.75, 1]
-N_REPLICATES = 40
+N_REPLICATES = 50
 
 def get_valid_combinations():
     valid = []
@@ -61,3 +61,19 @@ rule plot_pheno_covariance_all:
         covariance_plot = "figures/{arch}/h2_{h2}_b2_{b2}_all.png",
     conda: "envs/r-tools.yaml"
     script: "scripts/plot_covariance_all.R"
+
+rule plot_fullsib_covariance_series:
+    """
+    Plot correlations for b^2 = 0, 0.25, 0.5, 0.75 for a nice ascending series.
+    """
+    input: 
+        covariances_series = collect(
+            covariances_csv = "data/{arch}/h2_{h2}_b2_{b2}_covmatrix_merged.csv",
+            arch = "vct",
+            h2 = 0.001,
+            b2 = [0.0, 0.25, 0.5, 0.75]
+        )
+    output: 
+        covariance_plot = "figures/{arch}/h2_{h2}_b2_{b2}_all.png"
+    conda: "envs/r-tools.yaml"
+    script: "scripts/plot_covariance_fullsibs.R"
