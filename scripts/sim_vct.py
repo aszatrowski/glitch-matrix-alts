@@ -4,6 +4,11 @@ log_file = snakemake.log[0]
 sys.stdout = open(log_file, 'w')
 sys.stderr = sys.stdout
 
+# suppress warnings about the impending deprecation of copy-in-place. not ideal, but actively encouraged on the xftsim README until fixed. see: https://github.com/border-lab/xftsim/blame/7aff3ea27932a032e96b923f310d247ff535028f/README.md. Note that his has been in place for ~2 years now.
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+import datetime
 import xftsim as xft
 from xftsim.reproduce import RecombinationMap
 from xftsim.sim import Simulation # import as own object
@@ -165,14 +170,23 @@ sim = xft.sim.Simulation(
     post_processors=post_processors
 )
 
-print('Running generations...')
-sim.run(5)
-print('Complete.')
-print(sim)
+num_generations = int(snakemake.params['generations'])
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Running ' + str(num_generations) + ' generations...')
+sim.run(num_generations)
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Complete.')
     
-print('Building covariance matrix...')
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Building covariance matrix...')
 cov = make_covariance_matrix(sim, maf = 0.01, include_pedigree=False)
-print('Complete.')
-print('Writing covariance matrix...')
+
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Complete.')
+
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Writing covariance matrix...')
 cov.to_csv(snakemake.output['covariances_csv'], index=False)
-print('Complete.')
+
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Complete.')
