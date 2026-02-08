@@ -148,11 +148,10 @@ def make_covariance_matrix(
             if mask.any():
                 pd_pheno.loc[:, mask] = (pd_pheno.loc[:, mask] - pd_pheno.loc[:, mask].mean()) / pd_pheno.loc[:, mask].std()
     # GRM for genetic covariance.
-    # grm = compute_grm(simulation, maf_min=maf)
+    grm = compute_grm(simulation, maf_min=maf)
 
     # Phenotype-related covariance matrices.
     pcov = pd_pheno.loc[:, ('Y', 'phenotype')] @ pd_pheno.loc[:, ('Y', 'phenotype')].T
-    acov = pd_pheno.loc[:, ('Y', 'additiveGenetic')] @ pd_pheno.loc[:, ('Y', 'additiveGenetic')].T
 
     # Upper-triangle entries (including diagonal).
     num_individuals = len(ids)
@@ -167,7 +166,7 @@ def make_covariance_matrix(
         "pedigree_id1": [pair[0] for pair in individual_pairs],
         "pedigree_id2": [pair[1] for pair in individual_pairs],
         "Y": pcov.values[tri_idx],
-        "Genetic_Covariance": acov.values[tri_idx],
+        "Genetic_Covariance": grm[tri_idx],
     }
 
     covariances = pd.DataFrame(data)
