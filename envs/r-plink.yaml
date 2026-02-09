@@ -1,4 +1,4 @@
-name: r-tools
+name: r-plink
 channels:
   - conda-forge
   - bioconda
@@ -8,4 +8,4 @@ dependencies:
   - r-tidyverse
   - r-arrow
   - r-data.table
-  - plink
+  - plink2

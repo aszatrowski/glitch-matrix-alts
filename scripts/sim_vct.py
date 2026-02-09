@@ -178,15 +178,9 @@ now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Complete.')
     
 now = datetime.datetime.now()
-print('[' + str(now) + ']' + ' Building covariance matrix...')
-cov = make_covariance_matrix(sim, maf = 0.01, include_pedigree=False)
-
-now = datetime.datetime.now()
-print('[' + str(now) + ']' + ' Complete.')
-
-now = datetime.datetime.now()
-print('[' + str(now) + ']' + ' Writing covariance matrix...')
-cov.to_csv(snakemake.output['covariances_csv'], index=False)
+print('[' + str(now) + ']' + ' Writing to plink format...')
+rep = snakemake.wildcards['rep']
+xft.io.write_to_plink1(sim.haplotypes, f"data/vct/plink/h2_{h2}_b2_{b2}_rep{rep}_plink")
 
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Complete.')
