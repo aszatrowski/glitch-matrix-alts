@@ -201,12 +201,11 @@ arch, _ = vct_architecture(
     w=0,
 )
 
-mating_regime = xft.mate.RandomMatingRegime(
-    mates_per_female=1,
-    offspring_per_pair=2,
-    female_offspring_per_pair="balanced",
-    exhaustive=True,
-)
+mating_regime = xft.mate.RandomMatingRegime(offspring_per_pair = xft.utils.ConstantCount(2),
+                                mates_per_female = xft.utils.ConstantCount(1),
+                                female_offspring_per_pair = 'balanced',
+                                sex_aware = False,
+                                exhaustive = True)
 
 post_processors = [xft.proc.LimitMemory(n_haplotype_generations=1)]
 sim = xft.sim.Simulation(
