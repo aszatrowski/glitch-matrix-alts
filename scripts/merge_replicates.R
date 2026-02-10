@@ -57,5 +57,6 @@ grm_pcov_averaged <- grm_all[pcov_all, on = .(xftsim_id1, xftsim_id2, replicate)
 ]
 # remove self covariances
 grm_pcov_averaged <- grm_pcov_averaged[xftsim_id1 != xftsim_id2, ]
+grm_pcov_averaged <- grm_pcov_averaged[genotype_covariance < 0.6, ]
 
 data.table::fwrite(grm_pcov_averaged, snakemake@output[["merged_replicates"]], sep = ",", col.names = TRUE)

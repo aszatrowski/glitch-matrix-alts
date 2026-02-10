@@ -1,5 +1,5 @@
 library(ggplot2)
-library(dplyr)
+suppressPackageStartupMessages(library("dplyr"))
 
 binwidth <- snakemake@params$binwidth
 min_obs_in_bin <- snakemake@params$min_obs_in_bin 

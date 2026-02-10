@@ -1,7 +1,6 @@
 library(ggplot2)
 
-cov_df <- readr::read_csv(snakemake@input$covariances_csv, show_col_types = FALSE) |>
-  dplyr::filter(genotype_covariance < 1.5 & genotype_covariance > -1.5)
+cov_df <- readr::read_csv(snakemake@input$covariances_csv, show_col_types = FALSE)
 
 he_regression <- lm(phenotype_covariance ~ genotype_covariance, data = cov_df)
 he_est <- round(coef(he_regression)[2], 3)
