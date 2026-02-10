@@ -22,7 +22,6 @@ p <- ggplot(cov_df, aes(x = genotype_covariance, y = phenotype_covariance)) +
   geom_point() +
   geom_line() +
   geom_abline(intercept = he_intercept, slope = he_est, color = "blue") +
-  scale_y_continuous(limits = c(-0.15, 1.25)) +
   labs(
     title = title_text,
     subtitle = he_label,
