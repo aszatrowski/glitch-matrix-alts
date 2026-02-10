@@ -1,16 +1,13 @@
-# h2_VALUES = [0.001, 0.5, 1]
-# b2_VALUES = [0.0, 0.25, 0.5, 0.75, 1]
-# N_REPLICATES = 50
-h2_VALUES = [0.001]
-b2_VALUES = [0.0, 0.25, 0.5]
-N_REPLICATES = 2
+h2_VALUES = ["0.001", "0.5", "1.0"]
+b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
+N_REPLICATES = 20
 
 def get_valid_combinations():
     valid = []
     for h2 in h2_VALUES:
         for b2 in b2_VALUES:
-            if h2 + b2 <= 1.0:  # Ensure environmental component is non-negative
-                valid.append((h2, b2))
+            if float(h2) + float(b2) <= 1.0:  # Coerce for comparison
+                valid.append((h2, b2))  # But keep as strings
     return valid
 
 def get_all_outputs_vct():
@@ -27,12 +24,11 @@ rule all:
 
 rule sim_vct:
     output: 
-        # covariances_csv = temp("data/vct/h2_{h2}_b2_{b2}_rep{rep}_covmatrix.csv")
-        covariances_plink = multiext(
+        covariances_plink = temp(multiext(
             "data/vct/plink/h2_{h2}_b2_{b2}_rep{rep}_plink",
             ".bed", ".bim", ".fam"
-        ),
-        phenotype_covariances = "data/vct/pcov/h2_{h2}_b2_{b2}_rep{rep}.csv"
+        )),
+        phenotype_covariances = temp("data/vct/pcov/h2_{h2}_b2_{b2}_rep{rep}.csv")
     params:
         n_indivs = 1200,
         m_variants = 300,
@@ -50,10 +46,12 @@ rule plink_compute_grm:
             ".bed", ".bim", ".fam"
         )
     output: 
-        multiext(
+        temp(multiext(
             "data/vct/grm/h2_{h2}_b2_{b2}_rep{rep}",
             ".rel", ".rel.id"
-        )
+        ))
+    log:
+        "logs/vct/plink/h2_{h2}_b2_{b2}_rep{rep}.log"
     threads: 2
     params:
         min_af = 0.01
@@ -66,7 +64,8 @@ rule plink_compute_grm:
         --make-rel square0 \
         --threads {threads} \
         --nonfounders \
-        --out data/vct/grm/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep}
+        --out data/vct/grm/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep} \
+        &> {log}
         """
 
 rule merge_replicates:
