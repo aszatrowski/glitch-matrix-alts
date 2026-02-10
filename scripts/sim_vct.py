@@ -14,6 +14,7 @@ from xftsim.reproduce import RecombinationMap
 from xftsim.sim import Simulation # import as own object
 
 import numpy as np
+import pandas as pd
 import random
 
 from minimal_simulation_utils import make_covariance_matrix, build_minimal_founders
@@ -140,6 +141,53 @@ def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n
     print("Done making architecture.")
     return([arch,causal_sites])
 
+def compute_pheno_covariances(
+    simulation,
+) -> pd.DataFrame:
+    """
+    Build a phenotype-only covariance table for the current generation.
+
+    Returns a DataFrame with upper-triangle entries for:
+    - pedigree_id1, pedigree_id2
+    - Y: phenotype covariance
+    """
+    # Identify individuals in the current generation.
+    ids = list(simulation.pedigree.generation(simulation.generation).nodes)
+
+    # Extract and standardize phenotypes.
+    pd_pheno = simulation.phenotypes.xft.as_pd()
+    pd_pheno = pd_pheno.sort_index(axis=1)
+    # normalize phenotype values
+    # use .loc to avoid chained indexing; chained indexing will break in pandas 3.0.
+    # iterate over all phenotype components through hierarchical indexing
+    for pheno in pd_pheno.columns.get_level_values('phenotype_name').unique():
+        for comp in pd_pheno.columns.get_level_values('component_name').unique():
+            mask = (pd_pheno.columns.get_level_values('phenotype_name') == pheno) & \
+                   (pd_pheno.columns.get_level_values('component_name') == comp)
+            if mask.any():
+                pd_pheno.loc[:, mask] = (pd_pheno.loc[:, mask] - pd_pheno.loc[:, mask].mean()) / pd_pheno.loc[:, mask].std()
+    # Phenotype-related covariance matrices.
+    y_vals = pd_pheno.loc[:, ('Y', 'phenotype')].values
+    pcov = y_vals @ y_vals.T
+
+    # Upper-triangle entries (including diagonal).
+    num_individuals = len(ids)
+    tri_idx = np.triu_indices(num_individuals, k=0)
+    individual_pairs = [
+        (ids[i], ids[j])
+        for i in range(num_individuals)
+        for j in range(i, num_individuals)
+    ]
+
+    data = {
+        "xftsim_id1": [pair[0] for pair in individual_pairs],
+        "xftsim_id2": [pair[1] for pair in individual_pairs],
+        "phenotype_covariance": pcov[tri_idx],
+    }
+
+    covariances = pd.DataFrame(data)
+    return covariances
+
 if h2 + b2 > 1.0:
     raise ValueError("Require h2 + b2 <= 1.0.")
 
@@ -170,6 +218,7 @@ sim = xft.sim.Simulation(
     post_processors=post_processors
 )
 
+# Run generations with timings
 num_generations = int(snakemake.params['generations'])
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Running ' + str(num_generations) + ' generations...')
@@ -177,10 +226,24 @@ sim.run(num_generations)
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Complete.')
     
+# Write genotypes to plink format for GRM computation with timings
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Writing to plink format...')
 rep = snakemake.wildcards['rep']
 xft.io.write_to_plink1(sim.haplotypes, f"data/vct/plink/h2_{h2}_b2_{b2}_rep{rep}_plink")
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Complete.')
 
+# Compute phenotypic covariances
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Computing phenotype covariances...')
+pcov_df = compute_pheno_covariances(sim)
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Complete.')
+
+# Write phenotypic covariances
+now = datetime.datetime.now()
+print('[' + str(now) + ']' + ' Writing phenotype covariances...')
+pcov_df.to_csv(snakemake.output['phenotype_covariances'], index=False)
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Complete.')
