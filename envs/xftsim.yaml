@@ -7,9 +7,7 @@ channels:
 dependencies:
   - python=3.10.13
   - pandas=2.1.4
+  - xarray
   - pip
   - pip:
     - xftsim==0.2.0
-
-
-# try building base environment with snakemake and conda, not mamba; solving happens via libmamba anyway and maybe it won't redirect through midway's ancient (????) conda install

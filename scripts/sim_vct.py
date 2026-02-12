@@ -12,6 +12,9 @@ import datetime
 import xftsim as xft
 from xftsim.reproduce import RecombinationMap
 from xftsim.sim import Simulation # import as own object
+from xftsim.utils import ConstantCount, PoissonCount
+from xftsim.mate import LinearAssortativeMatingRegime
+import xarray as xr # for haplotype arrays
 
 import numpy as np
 import pandas as pd
@@ -141,6 +144,96 @@ def vct_architecture(founder_haplotypes, h2, b2, parental_coeff = 1/2, n=1000, n
     print("Done making architecture.")
     return([arch,causal_sites])
 
+class my_RandomMatingRegime(xft.mate.MatingRegime):
+    """
+    SOURCE: Marida, glitch-matrix/workflow/scripts/simulation_utils.py
+    A mating regime that randomly pairs individuals and produces offspring with balanced numbers of males and females.
+
+    Parameters
+    ----------
+    offspring_per_pair : xft.utils.VariableCount, optional
+        Number of offspring produced per mating pair, by default xft.utils.ConstantCount(1)
+    mates_per_female : xft.utils.VariableCount, optional
+        Number of males that mate with each female, by default xft.utils.ConstantCount(1)
+    female_offspring_per_pair : Union[str, xft.utils.VariableCount], optional
+        The number of female offspring per mating pair. If "balanced", the number is balanced with
+        the number of male offspring. By default, "balanced".
+    sex_aware : bool, optional
+        If True, randomly paired individuals are selected so that there is an equal number of males and females.
+        Otherwise, random pairing is performed. By default, False.
+    exhaustive : bool, optional
+        If True, perform exhaustive enumeration of potential mates. If False, perform random sampling. By default, True.
+    """
+    def __init__(self,
+                 offspring_per_pair: xft.utils.VariableCount = xft.utils.ConstantCount(1),
+                 mates_per_female: xft.utils.VariableCount =  xft.utils.ConstantCount(2),
+                 female_offspring_per_pair: xft.mate.Union[str, xft.utils.VariableCount] = 'balanced', ## doesn't make total sense
+                 sex_aware: bool = False,
+                 exhaustive: bool = True,
+                 ):
+        super().__init__(self,
+                         offspring_per_pair=offspring_per_pair,
+                         mates_per_female=mates_per_female,
+                         female_offspring_per_pair=female_offspring_per_pair,
+                         sex_aware=sex_aware,
+                         exhaustive=exhaustive,
+                         component_index = None,
+                         haplotypes = False,
+                         )
+
+
+    def mate(self,
+             haplotypes: xr.DataArray = None,
+             phenotypes: xr.DataArray = None,
+             control: dict = None,
+             ):
+        """
+        Mate individuals randomly with balanced numbers of males and females.
+
+        Parameters
+        ----------
+        haplotypes : xr.DataArray, optional
+            Array containing haplotypes, by default None
+        phenotypes : xr.DataArray, optional
+            Array containing phenotypes, by default None
+        control : dict, optional
+            Control dictionary, by default None
+
+        Returns
+        -------
+        MateAssignment
+            An object containing the maternal and paternal sample indices, the number of offspring per pair,
+            and the number of female offspring per pair.
+        """
+        self._sample_indexer = haplotypes.xft.get_sample_indexer()
+
+        if self.sex_aware:
+            female_indices = haplotypes.sample[haplotypes.sex == 0]
+            male_indices = haplotypes.sample[haplotypes.sex == 1]
+            if len(female_indices) != len(male_indices):
+                print("Warning: unequal sex ratio.")
+        else:
+            female_indices, male_indices = self.get_potential_mates(haplotypes, phenotypes)
+
+
+        female_indices = np.random.permutation(female_indices)
+        male_indices = np.random.permutation(male_indices)
+        if len(female_indices)!= len(male_indices):
+            # resample the smallest to get equal numbers
+            if len(female_indices) < len(male_indices):
+                # resample
+                female_indices = np.random.choice(female_indices,len(male_indices),replace=True)
+            else:
+                male_indices = np.random.choice(male_indices, len(female_indices), replace=True)
+            print(f"Size of m/f mating pool: {len(male_indices)} {len(female_indices)}.")
+
+
+        return self.enumerate_assignment(female_indices=female_indices,
+                                         male_indices=male_indices,
+                                         haplotypes=haplotypes,
+                                         phenotypes=phenotypes,
+                                         )
+
 def compute_pheno_covariances(
     simulation,
 ) -> pd.DataFrame:
@@ -201,11 +294,12 @@ arch, _ = vct_architecture(
     w=0,
 )
 
-mating_regime = xft.mate.RandomMatingRegime(offspring_per_pair = xft.utils.ConstantCount(2),
-                                mates_per_female = xft.utils.ConstantCount(1),
-                                female_offspring_per_pair = 'balanced',
-                                sex_aware = False,
-                                exhaustive = True)
+mating_regime = my_RandomMatingRegime(
+    mates_per_female=1,
+    offspring_per_pair= PoissonCount(2),
+    sex_aware=True,
+    female_offspring_per_pair = 'balanced'
+)
 
 post_processors = [xft.proc.LimitMemory(n_haplotype_generations=1)]
 sim = xft.sim.Simulation(
