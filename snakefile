@@ -1,4 +1,4 @@
-h2_VALUES = ["0.0001", "1.0"]
+h2_VALUES = ["0.0001", "0.5", "1.0"]
 b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
 N_REPLICATES = 5
 
@@ -56,7 +56,7 @@ rule plink_compute_grm:
     log:
         "logs/vct/plink/h2_{h2}_b2_{b2}_rep{rep}.log"
     resources:
-        mem = "2G",
+        mem = "8G",
         runtime = 5 
     threads: 2
     params:
@@ -110,7 +110,7 @@ rule plot_pheno_covariance_all:
     output: 
         covariance_plot = "figures/vct/h2_{h2}_b2_{b2}_all.png",
     resources:
-        mem = "12G",
+        mem = "16G",
         runtime = 10 
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_all.R"
