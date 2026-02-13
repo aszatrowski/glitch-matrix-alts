@@ -1,6 +1,6 @@
 h2_VALUES = ["0.0001", "1.0"]
 b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
-N_REPLICATES = 10
+N_REPLICATES = 50
 
 def get_valid_combinations():
     valid = []
@@ -81,7 +81,7 @@ rule merge_replicates:
     params:
         generations = 10
     resources:
-        mem = "16G",
+        mem = "20G",
         runtime = 5 
     threads: 2
     conda: "envs/r-plink.yaml"
