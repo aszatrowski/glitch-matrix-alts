@@ -1,6 +1,6 @@
 h2_VALUES = ["0.0001", "1.0"]
 b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
-N_REPLICATES = 50
+N_REPLICATES = 75
 
 def get_valid_combinations():
     valid = []
@@ -81,7 +81,7 @@ rule merge_replicates:
     params:
         generations = 10
     resources:
-        mem = "20G",
+        mem = "32G",
         runtime = 5 
     threads: 2
     conda: "envs/r-plink.yaml"
@@ -94,7 +94,7 @@ rule plot_pheno_covariance_binned:
         covariance_plot = "figures/vct/h2_{h2}_b2_{b2}_binned.png",
     params:
         binwidth = 0.01,
-        min_obs_in_bin = 5
+        min_obs_in_bin = 20
     resources:
         mem = "8G",
         runtime = 5 
@@ -111,3 +111,20 @@ rule plot_pheno_covariance_all:
         runtime = 10 
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_all.R"
+
+# rule plot_pheno_covariance_binned_overlay:
+#     input: 
+#         covariances_csv_list = collect(
+#           "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet",
+#           b2 = b2_VALUES
+#         )
+#     output: 
+#         covariance_plot = "figures/vct/h2_{h2}_b2_overlay_binned.png",
+#     params:
+#         binwidth = 0.01,
+#         min_obs_in_bin = 5
+#     resources:
+#         mem = "8G",
+#         runtime = 5 
+#     conda: "envs/r-plink.yaml"
+#     script: "scripts/plot_covariance_overlay_binned.R"
