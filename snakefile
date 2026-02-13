@@ -53,8 +53,6 @@ rule plink_compute_grm:
             "data/vct/grm/h2_{h2}_b2_{b2}_rep{rep}",
             ".rel", ".rel.id", ".log"
         ))
-    log:
-        "logs/vct/plink/h2_{h2}_b2_{b2}_rep{rep}.log"
     resources:
         mem = "8G",
         runtime = 5 
@@ -70,8 +68,7 @@ rule plink_compute_grm:
         --make-rel square0 \
         --threads {threads} \
         --nonfounders \
-        --out data/vct/grm/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep} \
-        &> {log}
+        --out data/vct/grm/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep}
         """
 
 rule merge_replicates:
