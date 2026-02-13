@@ -1,6 +1,6 @@
-h2_VALUES = ["0.0001", "0.5", "1.0"]
-b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
-N_REPLICATES = 1
+h2_VALUES = ["0.0001"]
+b2_VALUES = ["0.0", "0.25", "0.5", "0.75"]
+N_REPLICATES = 25
 
 def get_valid_combinations():
     valid = []
@@ -36,6 +36,9 @@ rule sim_vct:
         generations = 10
     log:
         "logs/vct/h2_{h2}_b2_{b2}_rep{rep}.log"
+    resources:
+        mem = "8G",
+        runtime = 5 
     conda: "envs/xftsim.yaml"
     script: "scripts/sim_vct.py" 
 
@@ -48,10 +51,13 @@ rule plink_compute_grm:
     output: 
         temp(multiext(
             "data/vct/grm/h2_{h2}_b2_{b2}_rep{rep}",
-            ".rel", ".rel.id"
+            ".rel", ".rel.id", ".log"
         ))
     log:
         "logs/vct/plink/h2_{h2}_b2_{b2}_rep{rep}.log"
+    resources:
+        mem = "8G",
+        runtime = 5 
     threads: 2
     params:
         min_af = 0.01
@@ -77,6 +83,9 @@ rule merge_replicates:
         merged_replicates = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.csv"
     params:
         generations = 10
+    resources:
+        mem = "16G",
+        runtime = 5 
     threads: 2
     conda: "envs/r-plink.yaml"
     script: "scripts/merge_replicates.R"
@@ -89,6 +98,9 @@ rule plot_pheno_covariance_binned:
     params:
         binwidth = 0.01,
         min_obs_in_bin = 5
+    resources:
+        mem = "8G",
+        runtime = 5 
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_binned.R"
 
@@ -97,5 +109,8 @@ rule plot_pheno_covariance_all:
         covariances_csv = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.csv"
     output: 
         covariance_plot = "figures/vct/h2_{h2}_b2_{b2}_all.png",
+    resources:
+        mem = "16G",
+        runtime = 10 
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_all.R"
