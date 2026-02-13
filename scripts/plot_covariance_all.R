@@ -1,23 +1,23 @@
 library(ggplot2)
-
-cov_df <- readr::read_csv(snakemake@input$covariances_csv, show_col_types = FALSE) |>
-  dplyr::slice_sample(n = 50000)
+library(dplyr)
+cov_df <- arrow::read_parquet(snakemake@input$covariances_csv) |> dplyr::as_tibble()
 
 he_regression <- lm(phenotype_covariance ~ genotype_covariance, data = cov_df)
 he_est <- round(coef(he_regression)[2], 3)
-he_label <- bquote(h^2[HE] == .(round(he_est, 3)))
 title_text <- bquote(h^2 == .(snakemake@wildcards$h2) ~ b^2 == .(snakemake@wildcards$b2))
 
 p <- ggplot(cov_df, aes(x = genotype_covariance, y = phenotype_covariance)) +
-  geom_density_2d_filled(alpha = 0.5) +
-  geom_abline(slope = he_est, intercept = 0, color = "blue", linetype = "solid") +
+  stat_bin2d(bins = 40, aes(fill = after_stat(log10(count)))) +
+  scale_fill_viridis_c(option = "plasma", na.value = "white") +
+  geom_abline(slope = he_est, intercept = coef(he_regression[1]), color = "cyan", linetype = "solid", linewidth = 0.8) +
   labs(
     title = title_text,
     subtitle = bquote(
       .(paste("Arch:", snakemake@wildcards$arch)) ~ h[HE]^2 == .(round(he_est, 3))
     ),
     x = "Genetic Covariance",
-    y = "Phenotypic Covariance"
+    y = "Phenotypic Covariance",
+    fill = expression(log[10] * "(count)")
   )
 
 ggsave(

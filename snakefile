@@ -1,6 +1,6 @@
-h2_VALUES = ["0.0001"]
-b2_VALUES = ["0.0", "0.25", "0.5", "0.75"]
-N_REPLICATES = 25
+h2_VALUES = ["0.0001", "1.0"]
+b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
+N_REPLICATES = 5
 
 def get_valid_combinations():
     valid = []
@@ -28,7 +28,7 @@ rule sim_vct:
             "data/vct/plink/h2_{h2}_b2_{b2}_rep{rep}_plink",
             ".bed", ".bim", ".fam"
         )),
-        phenotype_covariances = temp("data/vct/pcov/h2_{h2}_b2_{b2}_rep{rep}.csv")
+        phenotype_covariances = temp("data/vct/pcov/h2_{h2}_b2_{b2}_rep{rep}.parquet")
     params:
         n_indivs = 1200,
         m_variants = 300,
@@ -56,7 +56,7 @@ rule plink_compute_grm:
     log:
         "logs/vct/plink/h2_{h2}_b2_{b2}_rep{rep}.log"
     resources:
-        mem = "8G",
+        mem = "2G",
         runtime = 5 
     threads: 2
     params:
@@ -78,9 +78,9 @@ rule merge_replicates:
     input:
         grm_replicates = expand("data/vct/grm/h2_{{h2}}_b2_{{b2}}_rep{rep}.rel", rep=range(N_REPLICATES)),
         grm_replicate_iids = expand("data/vct/grm/h2_{{h2}}_b2_{{b2}}_rep{rep}.rel.id", rep=range(N_REPLICATES)),
-        phenotype_covariance_replicates = expand("data/vct/pcov/h2_{{h2}}_b2_{{b2}}_rep{rep}.csv", rep=range(N_REPLICATES))
+        phenotype_covariance_replicates = expand("data/vct/pcov/h2_{{h2}}_b2_{{b2}}_rep{rep}.parquet", rep=range(N_REPLICATES))
     output:
-        merged_replicates = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.csv"
+        merged_replicates = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
     params:
         generations = 10
     resources:
@@ -92,7 +92,7 @@ rule merge_replicates:
 
 rule plot_pheno_covariance_binned:
     input: 
-        covariances_csv = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.csv"
+        covariances_csv = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
     output: 
         covariance_plot = "figures/vct/h2_{h2}_b2_{b2}_binned.png",
     params:
@@ -106,11 +106,11 @@ rule plot_pheno_covariance_binned:
 
 rule plot_pheno_covariance_all:
     input: 
-        covariances_csv = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.csv"
+        covariances_csv = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
     output: 
         covariance_plot = "figures/vct/h2_{h2}_b2_{b2}_all.png",
     resources:
-        mem = "16G",
+        mem = "12G",
         runtime = 10 
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_all.R"

@@ -337,6 +337,6 @@ print('[' + str(now) + ']' + ' Complete.')
 # Write phenotypic covariances
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Writing phenotype covariances...')
-pcov_df.to_csv(snakemake.output['phenotype_covariances'], index=False)
+pcov_df.to_parquet(snakemake.output['phenotype_covariances'], index=False)
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Complete.')

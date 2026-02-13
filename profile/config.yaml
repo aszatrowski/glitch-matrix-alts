@@ -1,7 +1,7 @@
 # cluster settings:
 executor: slurm
 cores: 10
-jobs: 4
+jobs: 5
 default-resources:
   slurm_account: pi-lbarreiro # bill Luis
   slurm_partition: lbarreiro # don't bill Luis

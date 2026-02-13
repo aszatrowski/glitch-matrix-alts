@@ -47,7 +47,7 @@ pcov_paths <- snakemake@input[['phenotype_covariance_replicates']]
 
 grm_all <- import_melt_multiple(grm_file_paths, iid_paths, "genotype_covariance")
 pcov_all <- rbindlist(lapply(seq_along(pcov_paths), function(i) {
-  pcov_dt <- fread(pcov_paths[i], nThread = snakemake@threads)
+  pcov_dt <- arrow::read_parquet(pcov_paths[i]) |> as.data.table()
   pcov_dt[, replicate := i]
 }))
 grm_pcov_averaged <- grm_all[pcov_all, on = .(xftsim_id1, xftsim_id2, replicate)][,
@@ -59,4 +59,4 @@ grm_pcov_averaged <- grm_all[pcov_all, on = .(xftsim_id1, xftsim_id2, replicate)
 grm_pcov_averaged <- grm_pcov_averaged[xftsim_id1 != xftsim_id2, ]
 grm_pcov_averaged <- grm_pcov_averaged[genotype_covariance < 0.75, ]
 
-data.table::fwrite(grm_pcov_averaged, snakemake@output[["merged_replicates"]], sep = ",", col.names = TRUE)
+arrow::write_parquet(grm_pcov_averaged, snakemake@output[["merged_replicates"]])
