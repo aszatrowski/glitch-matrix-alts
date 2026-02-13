@@ -10,7 +10,8 @@ cov_df <- arrow::read_parquet(snakemake@input$covariances_csv) |> dplyr::as_tibb
   dplyr::group_by(gc_bins = cut(genotype_covariance, x_axis_cuts_relhat)) |>
   dplyr::mutate(n=n()) |>
   dplyr::filter(n > min_obs_in_bin) |>
-  dplyr::summarize(across(-contains("id"), function(x) mean(x, na.rm=TRUE)))
+  dplyr::summarize(across(-contains("id"), function(x) mean(x, na.rm=TRUE))) |>
+  dplyr::filter(genotype_covariance > -0.2 & genotype_covariance < 0.65)
 
 he_regression <- lm(phenotype_covariance ~ genotype_covariance, data = cov_df)
 he_est <- round(coef(he_regression)[2], 3)

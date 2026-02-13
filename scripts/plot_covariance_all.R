@@ -1,6 +1,8 @@
 library(ggplot2)
 library(dplyr)
-cov_df <- arrow::read_parquet(snakemake@input$covariances_csv) |> dplyr::as_tibble()
+cov_df <- arrow::read_parquet(snakemake@input$covariances_csv) |>
+  dplyr::as_tibble() |>
+  dplyr::filter(genotype_covariance > -0.2 & genotype_covariance < 0.65)
 
 he_regression <- lm(phenotype_covariance ~ genotype_covariance, data = cov_df)
 he_est <- round(coef(he_regression)[2], 3)
