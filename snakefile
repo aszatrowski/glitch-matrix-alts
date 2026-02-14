@@ -1,6 +1,6 @@
 h2_VALUES = ["0.0001", "1.0"]
-b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
-N_REPLICATES = 75
+b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "0.9999"]
+N_REPLICATES = 10
 
 def get_valid_combinations():
     valid = []
@@ -18,10 +18,17 @@ def get_all_outputs_vct():
             outputs.append(f"figures/vct/h2_{h2}_b2_{b2}_binned.png")
     return outputs
 
+def get_overlay_outputs():
+    outputs = []
+    for h2, b2 in get_valid_combinations():
+        outputs.append(f"figures/vct/overlay_h2_{h2}_b2_binned.png")
+    return outputs
+
 rule all:
     input: 
-        get_all_outputs_vct()
-
+        get_all_outputs_vct(),
+        get_overlay_outputs()
+    
 rule sim_vct:
     output: 
         covariances_plink = temp(multiext(
@@ -30,9 +37,10 @@ rule sim_vct:
         )),
         phenotype_covariances = temp("data/vct/pcov/h2_{h2}_b2_{b2}_rep{rep}.parquet")
     params:
-        n_indivs = 1200,
-        m_variants = 300,
-        n_causal = 200,
+        n_indivs = 1500,
+        m_variants = 1e5,
+        n_causal = 9e4,
+        chrom_count = 2,
         generations = 10
     log:
         "logs/vct/h2_{h2}_b2_{b2}_rep{rep}.log"
@@ -112,19 +120,20 @@ rule plot_pheno_covariance_all:
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_all.R"
 
-# rule plot_pheno_covariance_binned_overlay:
-#     input: 
-#         covariances_csv_list = collect(
-#           "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet",
-#           b2 = b2_VALUES
-#         )
-#     output: 
-#         covariance_plot = "figures/vct/h2_{h2}_b2_overlay_binned.png",
-#     params:
-#         binwidth = 0.01,
-#         min_obs_in_bin = 5
-#     resources:
-#         mem = "8G",
-#         runtime = 5 
-#     conda: "envs/r-plink.yaml"
-#     script: "scripts/plot_covariance_overlay_binned.R"
+rule plot_pheno_covariance_binned_overlay:
+    input: 
+        covariances_csv_list = lambda wildcards: [
+            f"data/vct/h2_{wildcards.h2}_b2_{b2}_covmatrix_merged.parquet"
+            for b2 in b2_VALUES
+            if float(wildcards.h2) + float(b2) <= 1.0
+        ]
+    output: 
+        covariance_plot = "figures/vct/overlay_h2_{h2}_b2_binned.png",
+    params:
+        binwidth = 0.01,
+        min_obs_in_bin = 5
+    resources:
+        mem = "16G",
+        runtime = 5 
+    conda: "envs/r-plink.yaml"
+    script: "scripts/plot_covariance_overlay_binned.R"

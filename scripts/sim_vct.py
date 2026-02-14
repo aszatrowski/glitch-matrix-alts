@@ -31,6 +31,8 @@ m_variants = int(snakemake.params['m_variants'])
 h2=float(snakemake.wildcards['h2'])
 b2=float(snakemake.wildcards['b2'])
 
+chrom_count = int(snakemake.params['chrom_count'])
+
 print(f"n_indivs={n_indivs}, n_causal={n_causal}, m_variants={m_variants}, h2={h2}, b2={b2}, rep/seed={int(snakemake.wildcards['rep'])}")
 
 founders, recomb = build_minimal_founders(
@@ -38,7 +40,7 @@ founders, recomb = build_minimal_founders(
     m_variants=m_variants,
     min_af=0.1,
     max_af=0.5,
-    chrom=1
+    chrom=2
 )
 
 def additive_effects_freq(founder_haplotypes, n_causal = None, w = 1, h2 = 0):
