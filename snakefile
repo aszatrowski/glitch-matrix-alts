@@ -1,6 +1,6 @@
 h2_VALUES = ["0.0001", "1.0"]
 b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "0.9999"]
-N_REPLICATES = 10
+N_REPLICATES = 50
 
 def get_valid_combinations():
     valid = []
@@ -104,7 +104,7 @@ rule plot_pheno_covariance_binned:
         binwidth = 0.01,
         min_obs_in_bin = 20
     resources:
-        mem = "8G",
+        mem = "16G",
         runtime = 5 
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_binned.R"
@@ -133,7 +133,7 @@ rule plot_pheno_covariance_binned_overlay:
         binwidth = 0.01,
         min_obs_in_bin = 5
     resources:
-        mem = "16G",
+        mem = "64G",
         runtime = 5 
     conda: "envs/r-plink.yaml"
     script: "scripts/plot_covariance_overlay_binned.R"
