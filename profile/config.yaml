@@ -3,6 +3,6 @@ executor: slurm
 cores: 10
 jobs: 10
 default-resources:
-  slurm_account: pi-lbarreiro # bill Luis
-  slurm_partition: lbarreiro # don't bill Luis
+  slurm_account: pi-jnovembre # bill Luis
+  slurm_partition: jnovembre-hm # don't bill Luis
 use-conda: true

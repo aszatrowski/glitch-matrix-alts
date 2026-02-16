@@ -38,15 +38,15 @@ rule sim_vct:
         phenotype_covariances = temp("data/vct/pcov/h2_{h2}_b2_{b2}_rep{rep}.parquet")
     params:
         n_indivs = 1500,
-        m_variants = 1e5,
-        n_causal = 9e4,
+        m_variants = 5e5,
+        n_causal = 5e5 - 1,
         chrom_count = 2,
         generations = 10
     log:
         "logs/vct/h2_{h2}_b2_{b2}_rep{rep}.log"
     resources:
-        mem = "8G",
-        runtime = 5 
+        mem = "48G",
+        runtime = 15
     conda: "envs/xftsim.yaml"
     script: "scripts/sim_vct.py" 
 
