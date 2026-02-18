@@ -32,10 +32,10 @@ rule all:
 rule sim_vct:
     output: 
         covariances_plink = temp(multiext(
-            "data/vct/plink/h2_{h2}_b2_{b2}_rep{rep}_plink",
+            "data/{{arch}}/plink/h2_{h2}_b2_{b2}_rep{rep}_plink",
             ".bed", ".bim", ".fam"
         )),
-        phenotype_covariances = temp("data/vct/pcov/h2_{h2}_b2_{b2}_rep{rep}.parquet")
+        phenotype_covariances = temp("data/{{arch}}/pcov/h2_{h2}_b2_{b2}_rep{rep}.parquet")
     params:
         n_indivs = 1500,
         m_variants = 5e5,
@@ -43,7 +43,7 @@ rule sim_vct:
         chrom_count = 2,
         generations = 10
     log:
-        "logs/vct/h2_{h2}_b2_{b2}_rep{rep}.log"
+        "logs/{{arch}}/h2_{h2}_b2_{b2}_rep{rep}.log"
     resources:
         mem = "48G",
         runtime = 15
@@ -53,12 +53,12 @@ rule sim_vct:
 rule plink_compute_grm:
     input: 
         covariances_plink = multiext(
-            "data/vct/plink/h2_{h2}_b2_{b2}_rep{rep}_plink",
+            "data/{{arch}}/plink/h2_{h2}_b2_{b2}_rep{rep}_plink",
             ".bed", ".bim", ".fam"
         )
     output: 
         temp(multiext(
-            "data/vct/grm/h2_{h2}_b2_{b2}_rep{rep}",
+            "data/{{arch}}/grm/h2_{h2}_b2_{b2}_rep{rep}",
             ".rel", ".rel.id", ".log"
         ))
     resources:
@@ -71,21 +71,21 @@ rule plink_compute_grm:
     shell: 
         """
         plink2 \
-        --bfile data/vct/plink/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep}_plink \
+        --bfile data/{{arch}}/plink/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep}_plink \
         --min-af {params.min_af} \
         --make-rel square0 \
         --threads {threads} \
         --nonfounders \
-        --out data/vct/grm/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep}
+        --out data/{{arch}}/grm/h2_{wildcards.h2}_b2_{wildcards.b2}_rep{wildcards.rep}
         """
 
 rule merge_replicates:
     input:
-        grm_replicates = expand("data/vct/grm/h2_{{h2}}_b2_{{b2}}_rep{rep}.rel", rep=range(N_REPLICATES)),
-        grm_replicate_iids = expand("data/vct/grm/h2_{{h2}}_b2_{{b2}}_rep{rep}.rel.id", rep=range(N_REPLICATES)),
-        phenotype_covariance_replicates = expand("data/vct/pcov/h2_{{h2}}_b2_{{b2}}_rep{rep}.parquet", rep=range(N_REPLICATES))
+        grm_replicates = expand("data/{{arch}}/grm/h2_{{h2}}_b2_{{b2}}_rep{rep}.rel", rep=range(N_REPLICATES)),
+        grm_replicate_iids = expand("data/{{arch}}/grm/h2_{{h2}}_b2_{{b2}}_rep{rep}.rel.id", rep=range(N_REPLICATES)),
+        phenotype_covariance_replicates = expand("data/{{arch}}/pcov/h2_{{h2}}_b2_{{b2}}_rep{rep}.parquet", rep=range(N_REPLICATES))
     output:
-        merged_replicates = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
+        merged_replicates = "data/{{arch}}/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
     params:
         generations = 10
     resources:
@@ -97,9 +97,9 @@ rule merge_replicates:
 
 rule plot_pheno_covariance_binned:
     input: 
-        covariances_csv = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
+        covariances_csv = "data/{{arch}}/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
     output: 
-        covariance_plot = "figures/vct/h2_{h2}_b2_{b2}_binned.png",
+        covariance_plot = "figures/{{arch}}/h2_{h2}_b2_{b2}_binned.png",
     params:
         binwidth = 0.01,
         min_obs_in_bin = 20
@@ -111,9 +111,9 @@ rule plot_pheno_covariance_binned:
 
 rule plot_pheno_covariance_all:
     input: 
-        covariances_csv = "data/vct/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
+        covariances_csv = "data/{{arch}}/h2_{h2}_b2_{b2}_covmatrix_merged.parquet"
     output: 
-        covariance_plot = "figures/vct/h2_{h2}_b2_{b2}_all.png",
+        covariance_plot = "figures/{{arch}}/h2_{h2}_b2_{b2}_all.png",
     resources:
         mem = "16G",
         runtime = 10 
@@ -123,12 +123,12 @@ rule plot_pheno_covariance_all:
 rule plot_pheno_covariance_binned_overlay:
     input: 
         covariances_csv_list = lambda wildcards: [
-            f"data/vct/h2_{wildcards.h2}_b2_{b2}_covmatrix_merged.parquet"
+            f"data/{{arch}}/h2_{wildcards.h2}_b2_{b2}_covmatrix_merged.parquet"
             for b2 in b2_VALUES
             if float(wildcards.h2) + float(b2) <= 1.0
         ]
     output: 
-        covariance_plot = "figures/vct/overlay_h2_{h2}_b2_binned.png",
+        covariance_plot = "figures/{{arch}}/overlay_h2_{h2}_b2_binned.png",
     params:
         binwidth = 0.01,
         min_obs_in_bin = 5
