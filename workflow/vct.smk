@@ -7,8 +7,8 @@ rule sim_vct:
         phenotype_covariances = temp("data/{arch}/pcov/h2_{h2}_b2_{b2}_pc_{parental_coef}_rep{rep}.parquet")
     params:
         n_indivs = 1500,
-        m_variants = 5e3,
-        n_causal = 5e3 - 1,
+        m_variants = 5e4,
+        n_causal = 5e4 - 1,
         chrom_count = 2,
         generations = 10
     log:
