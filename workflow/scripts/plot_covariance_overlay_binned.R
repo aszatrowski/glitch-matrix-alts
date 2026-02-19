@@ -11,12 +11,27 @@ cov_paths <- snakemake@input$covariances_csv_list
 cov_list <- lapply(seq_along(cov_paths), function(i) {
   path <- cov_paths[i]
   # Extract b2 from filename: h2_{h2}_b2_{b2}_covmatrix_merged.parquet
-  b2_match <- regmatches(path, regexpr("b2_[^_]+", path))
-  b2_val <- sub("b2_", "", b2_match)
-  
-  # Read and add b2 column
+  # Use the basename and a capture to reliably extract numeric b2 (handles dots, signs, exponents)
+  fname <- basename(path)
+  m <- regexec("_b2_([-0-9.eE]+)(?:_|\\.|$)", fname)
+  reg <- regmatches(fname, m)
+  if (length(reg) && length(reg[[1]]) >= 2) {
+    b2_val <- reg[[1]][2]
+  } else {
+    # Fallback: simple match (older pattern)
+    b2_match <- regmatches(fname, regexpr("b2_[^_.]+", fname))
+    b2_val <- sub("b2_", "", b2_match)
+  }
+
+  # Coerce to numeric and warn if parsing failed (NA)
+  b2_num <- as.numeric(b2_val)
+  if (is.na(b2_num)) {
+    warning(sprintf("Could not parse b2 from filename '%s' (extracted: '%s')", fname, b2_val))
+  }
+
+  # Read parquet and add numeric b2 column
   dt <- arrow::read_parquet(path) |> as.data.table()
-  dt[, b2 := b2_val]
+  dt[, b2 := b2_num]
   return(dt)
 })
 

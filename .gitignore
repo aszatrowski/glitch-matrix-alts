@@ -3,4 +3,4 @@
 .DS_Store
 data/
 logs/
-scripts/__pycache__
+workflow/scripts/__pycache__/
