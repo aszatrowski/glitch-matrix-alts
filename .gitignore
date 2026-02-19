@@ -1,6 +1,7 @@
 .snakemake
 .vscode
 .DS_Store
+.tests/
 data/
 logs/
 scripts/__pycache__
