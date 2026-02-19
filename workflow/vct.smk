@@ -97,7 +97,7 @@ rule plot_pheno_covariance_binned_overlay:
             if float(wildcards.h2) + float(b2) <= 1.0
         ]
     output: 
-        covariance_plot = "figures/{arch}/overlay_h2_{h2}_pc_{parental_coef}_binned.png",
+        covariance_plot = "figures/{arch}/b2_overlay/overlay_h2_{h2}_pc_{parental_coef}_binned.png",
     params:
         binwidth = 0.01,
         min_obs_in_bin = 5
