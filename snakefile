@@ -1,8 +1,8 @@
 h2_VALUES = ["0.0001", "1.0"]
 b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "0.9999"]
-parental_coef_VALUES = ["0.0", "0.5"]
+parental_coef_VALUES = ["0.0", "0.5", "1.0"]
 
-N_REPLICATES = 10
+N_REPLICATES = 25
 
 def get_valid_combinations():
     valid = []
