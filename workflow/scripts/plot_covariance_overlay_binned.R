@@ -4,7 +4,8 @@ library(ggplot2)
 binwidth <- snakemake@params$binwidth
 min_obs_in_bin <- snakemake@params$min_obs_in_bin 
 h2_val <- snakemake@wildcards$h2
-arch <- "M-P equal VCT"
+arch <- snakemake@wildcards$arch 
+parental_coef <- snakemake@wildcards$parental_coef
 
 # Read all parquet files and extract b2 from filename, binding into single table
 cov_paths <- snakemake@input$covariances_csv_list
@@ -62,6 +63,7 @@ p <- ggplot(binned_dt, aes(x = genotype_covariance, y = phenotype_covariance, co
   scale_color_viridis_d() +
   labs(
     title = bquote("Phenotype covariance by" ~ b^2),
+    subtitle = bquote(paste("arch:" ~ .(arch), ", ", h^2 == .(h2_val) ~ c[m] == .(parental_coef))),
     x = "Genetic Covariance",
     y = "Phenotypic Covariance",
     color = bquote(b^2)

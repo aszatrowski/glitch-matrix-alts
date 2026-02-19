@@ -10,30 +10,28 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import datetime
 import xftsim as xft
-from xftsim.reproduce import RecombinationMap
-from xftsim.sim import Simulation # import as own object
-from xftsim.utils import ConstantCount, PoissonCount
-from xftsim.mate import LinearAssortativeMatingRegime
 import xarray as xr # for haplotype arrays
 
 import numpy as np
 import pandas as pd
 import random
 
-from minimal_simulation_utils import make_covariance_matrix, build_minimal_founders
+from minimal_simulation_utils import build_minimal_founders
 
-random.seed(int(snakemake.wildcards['rep'])) # ensure each replicate is different yet individually reproducible
+arch = snakemake.wildcards['arch']
+h2=float(snakemake.wildcards['h2'])
+b2=float(snakemake.wildcards['b2'])
+parental_coef = float(snakemake.wildcards['parental_coef'])
+rep = snakemake.wildcards['rep']
+random.seed(rep) # ensure each replicate is different yet individually reproducible
+
 # import simulation parameters from snakemake environment object; make sure all are float or int
 n_indivs=int(snakemake.params['n_indivs'])
 n_causal = int(snakemake.params['n_causal'])
 m_variants = int(snakemake.params['m_variants'])
-
-h2=float(snakemake.wildcards['h2'])
-b2=float(snakemake.wildcards['b2'])
-
 chrom_count = int(snakemake.params['chrom_count'])
 
-print(f"n_indivs={n_indivs}, n_causal={n_causal}, m_variants={m_variants}, h2={h2}, b2={b2}, rep/seed={int(snakemake.wildcards['rep'])}")
+print(f"arch={arch}, n_indivs={n_indivs}, n_causal={n_causal}, m_variants={m_variants}, h2={h2}, b2={b2}, parental_coef={parental_coef}, rep/seed={rep}")
 
 founders, recomb = build_minimal_founders(
     n_indivs=n_indivs,
@@ -290,7 +288,7 @@ arch, _ = vct_architecture(
     founders,
     h2=h2,
     b2=b2,
-    parental_coeff=0.5,
+    parental_coeff=parental_coef,
     n=n_indivs,
     n_causal=n_causal,
     w=0,
@@ -298,7 +296,7 @@ arch, _ = vct_architecture(
 
 mating_regime = my_RandomMatingRegime(
     mates_per_female=1,
-    offspring_per_pair= PoissonCount(2),
+    offspring_per_pair=xft.utils.PoissonCount(2),
     sex_aware=True,
     female_offspring_per_pair = 'balanced'
 )
@@ -324,8 +322,7 @@ print('[' + str(now) + ']' + ' Complete.')
 # Write genotypes to plink format for GRM computation with timings
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Writing to plink format...')
-rep = snakemake.wildcards['rep']
-xft.io.write_to_plink1(sim.haplotypes, f"data/vct/plink/h2_{h2}_b2_{b2}_rep{rep}_plink")
+xft.io.write_to_plink1(sim.haplotypes, f"data/vct/plink/h2_{h2}_b2_{b2}_pc_{parental_coef}_rep{rep}_plink")
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Complete.')
 

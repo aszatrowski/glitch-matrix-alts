@@ -3,7 +3,7 @@ suppressPackageStartupMessages(library("dplyr"))
 
 binwidth <- snakemake@params$binwidth
 min_obs_in_bin <- snakemake@params$min_obs_in_bin 
-arch <- "M-P equal VCT"
+arch <- snakemake@wildcards$arch
 
 x_axis_cuts_relhat <- seq(-1, 1, binwidth)
 cov_df <- arrow::read_parquet(snakemake@input$covariances_csv) |> dplyr::as_tibble() |>
@@ -17,7 +17,9 @@ he_regression <- lm(phenotype_covariance ~ genotype_covariance, data = cov_df)
 he_est <- round(coef(he_regression)[2], 3)
 he_intercept <- coef(he_regression)[1]
 he_label <- bquote(h[HE]^2 == .(he_est))
-title_text <- bquote(paste(.(arch), ", ", h^2 == .(snakemake@wildcards$h2), " ", b^2 == .(snakemake@wildcards$b2)))
+
+parental_coef <- snakemake@wildcards$parental_coef
+title_text <- bquote(h^2 == .(snakemake@wildcards$h2) ~ b^2 == .(snakemake@wildcards$b2) ~ c[m] == .(parental_coef))
 
 p <- ggplot(cov_df, aes(x = genotype_covariance, y = phenotype_covariance)) +
   geom_point() +
