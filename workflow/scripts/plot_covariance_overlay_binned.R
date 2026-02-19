@@ -64,6 +64,11 @@ p <- ggplot(binned_dt, aes(x = genotype_covariance, y = phenotype_covariance, co
   labs(
     title = bquote("Phenotype covariance by" ~ b^2),
     subtitle = bquote(paste("arch:" ~ .(arch), ", ", h^2 == .(h2_val) ~ c[m] == .(parental_coef))),
+    caption = paste(
+      "Replicates:", snakemake@params$replicates,
+      "| Variants:", snakemake@params$m_variants,
+      "| Causal:", snakemake@params$n_causal
+    ),
     x = "Genetic Covariance",
     y = "Phenotypic Covariance",
     color = bquote(b^2)

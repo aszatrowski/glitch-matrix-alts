@@ -7,8 +7,8 @@ rule sim_vct:
         phenotype_covariances = temp("data/{arch}/pcov/h2_{h2}_b2_{b2}_pc_{parental_coef}_rep{rep}.parquet")
     params:
         n_indivs = 1500,
-        m_variants = 5e4,
-        n_causal = 5e4 - 1,
+        m_variants = N_VARIANTS,
+        n_causal = N_CAUSAL_VARIANTS,
         chrom_count = 2,
         generations = 10
     log:
@@ -100,7 +100,10 @@ rule plot_pheno_covariance_binned_overlay:
         covariance_plot = "figures/{arch}/b2_overlay/overlay_h2_{h2}_pc_{parental_coef}_binned.png",
     params:
         binwidth = 0.01,
-        min_obs_in_bin = 5
+        min_obs_in_bin = 5,
+        replicates = N_REPLICATES,
+        m_variants = N_VARIANTS,
+        n_causal = N_CAUSAL_VARIANTS,
     resources:
         mem = "64G",
         runtime = 5 
