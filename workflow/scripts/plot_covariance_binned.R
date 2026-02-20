@@ -31,7 +31,7 @@ p <- ggplot(cov_df, aes(x = genotype_covariance, y = phenotype_covariance)) +
     x = "Genetic Covariance",
     y = "Phenotypic Covariance"
   ) +
-  theme_classic()
+  theme_bw()
 
 ggsave(
   filename = snakemake@output$covariance_plot,

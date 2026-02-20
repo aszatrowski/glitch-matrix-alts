@@ -74,7 +74,7 @@ p <- ggplot(binned_dt, aes(x = genotype_covariance, y = phenotype_covariance, co
     y = "Phenotypic Covariance",
     color = bquote(b^2)
   ) +
-  theme_classic() +
+  theme_bw() +
   theme(legend.position = "right")
 
 ggsave(
