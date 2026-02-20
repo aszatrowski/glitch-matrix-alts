@@ -51,7 +51,7 @@ binned_dt <- cov_dt[,
     b2 = b2,
     gc_bins = cut(genotype_covariance, x_axis_cuts_relhat)
   )
-][n > min_obs_in_bin & genotype_covariance > -0.2 & genotype_covariance < 0.65]
+][n > min_obs_in_bin & genotype_covariance > -0.15 & genotype_covariance < 0.65]
 
 # Convert b2 to factor and order for consistent coloring
 binned_dt[, b2 := factor(b2, levels = sort(unique(as.numeric(b2))))]
@@ -61,7 +61,6 @@ p <- ggplot(binned_dt, aes(x = genotype_covariance, y = phenotype_covariance, co
   geom_point(size = 2) +
   geom_line() +
   scale_color_viridis_d() +
-  scale_x_continuous(limits = c(-0.05, 0.65)) +
   labs(
     title = bquote("Phenotype covariance by" ~ b^2),
     subtitle = bquote(paste("arch:" ~ .(arch), ", ", h^2 == .(h2_val) ~ c[m] == .(parental_coef))),

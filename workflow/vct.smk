@@ -15,7 +15,8 @@ rule sim_vct:
         "logs/{arch}/h2_{h2}_b2_{b2}_pc_{parental_coef}_rep{rep}.log"
     resources:
         mem = "48G",
-        runtime = 15
+        runtime = 15,
+        slurm_partition = "jnovembre-hm"
     conda: "envs/xftsim.yaml"
     script: "scripts/sim_vct.py" 
 
@@ -32,7 +33,8 @@ rule plink_compute_grm:
         ))
     resources:
         mem = "8G",
-        runtime = 5 
+        runtime = 5,
+        slurm_partition = "jnovembre"
     threads: 8
     params:
         min_af = 0.01
@@ -100,7 +102,7 @@ rule plot_pheno_covariance_binned_overlay:
         covariance_plot = "figures/{arch}/b2_overlay/overlay_h2_{h2}_pc_{parental_coef}_binned.png",
     params:
         binwidth = 0.01,
-        min_obs_in_bin = 5,
+        min_obs_in_bin = 25,
         replicates = N_REPLICATES,
         m_variants = N_VARIANTS,
         n_causal = N_CAUSAL_VARIANTS,
