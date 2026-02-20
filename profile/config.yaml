@@ -1,7 +1,6 @@
 # cluster settings:
 executor: slurm
-cores: 20
-jobs: 20
+jobs: 48
 default-resources:
   slurm_account: pi-jnovembre # bill Luis
   slurm_partition: jnovembre-hm # don't bill Luis
