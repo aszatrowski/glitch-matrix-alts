@@ -1,10 +1,10 @@
 h2_VALUES = ["0.0001", "1.0"]
 b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "0.9999"]
-parental_coef_VALUES = ["0.0", "0.25", "0.5", "1.0"]
+parental_coef_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
 
 N_REPLICATES = 25
-N_VARIANTS = 5e4
-N_CAUSAL_VARIANTS = 5e4 - 1
+N_VARIANTS = 5e5
+N_CAUSAL_VARIANTS = N_VARIANTS - 1
 
 def get_valid_combinations():
     valid = []

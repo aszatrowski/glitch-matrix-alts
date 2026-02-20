@@ -61,6 +61,7 @@ p <- ggplot(binned_dt, aes(x = genotype_covariance, y = phenotype_covariance, co
   geom_point(size = 2) +
   geom_line() +
   scale_color_viridis_d() +
+  scale_x_continuous(limits = c(-0.05, 0.65)) +
   labs(
     title = bquote("Phenotype covariance by" ~ b^2),
     subtitle = bquote(paste("arch:" ~ .(arch), ", ", h^2 == .(h2_val) ~ c[m] == .(parental_coef))),

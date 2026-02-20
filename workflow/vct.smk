@@ -33,7 +33,7 @@ rule plink_compute_grm:
     resources:
         mem = "8G",
         runtime = 5 
-    threads: 2
+    threads: 8
     params:
         min_af = 0.01
     conda: "envs/r-plink.yaml"
