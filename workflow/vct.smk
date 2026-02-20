@@ -85,6 +85,10 @@ rule plot_pheno_covariance_all:
         covariances_csv = "data/{arch}/h2_{h2}_b2_{b2}_pc_{parental_coef}_covmatrix_merged.parquet"
     output: 
         covariance_plot = "figures/{arch}/h2_{h2}_b2_{b2}_pc_{parental_coef}_all.png",
+    params:
+        replicates = N_REPLICATES,
+        m_variants = N_VARIANTS,
+        n_causal = N_CAUSAL_VARIANTS,
     resources:
         mem = "16G",
         runtime = 10 

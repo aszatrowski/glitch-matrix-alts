@@ -27,7 +27,6 @@ def get_all_outputs_vct():
     for h2, b2 in get_valid_combinations():
         for parental_coef in get_valid_parental_coefs(b2):
             outputs.append(f"figures/vct/h2_{h2}_b2_{b2}_pc_{parental_coef}_all.png")
-            outputs.append(f"figures/vct/h2_{h2}_b2_{b2}_pc_{parental_coef}_binned.png")
     return outputs
 
 def get_overlay_outputs():
@@ -41,4 +40,5 @@ include: "workflow/vct.smk"
 
 rule all:
     input: 
-        get_overlay_outputs()
+        get_overlay_outputs(),
+        get_all_outputs_vct()
