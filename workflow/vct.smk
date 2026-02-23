@@ -9,13 +9,13 @@ rule sim_vct:
         n_indivs = 1500,
         m_variants = N_VARIANTS,
         n_causal = N_CAUSAL_VARIANTS,
-        chrom_count = 2,
+        chrom_count = 10,
         generations = 10
     log:
         "logs/{arch}/h2_{h2}_b2_{b2}_pc_{parental_coef}_rep{rep}.log"
     resources:
         mem = "48G",
-        runtime = 15,
+        runtime = 20,
         slurm_partition = "jnovembre-hm"
     conda: "envs/xftsim.yaml"
     script: "scripts/sim_vct.py" 
