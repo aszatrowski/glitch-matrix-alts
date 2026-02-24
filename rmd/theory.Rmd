@@ -1,0 +1,15 @@
+---
+title: "Derivation for Inflation of Heritability by Parentally-Imbalanced VCT"
+author: Austin Szatrowski
+date: Feb 24, 2026
+monofont: NotoSansCJK-Regular
+header-includes: 
+  - \usepackage{tikz}
+  - \usepackage{amsmath}
+output:
+  pdf_document
+---
+
+$$
+\{text}{Var}(C) = \sum_i w_i b^2 = 
+$$

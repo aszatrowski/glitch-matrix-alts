@@ -8,4 +8,5 @@ dependencies:
   - r-tidyverse
   - r-arrow
   - r-data.table
+  - r-tinytex
   - plink2

@@ -6,6 +6,8 @@ N_REPLICATES = 25
 N_VARIANTS = 7.5e5
 N_CAUSAL_VARIANTS = N_VARIANTS - 1
 
+localrules: parental_imbalance_theory
+
 def get_valid_combinations():
     valid = []
     for h2 in h2_VALUES:
@@ -41,4 +43,18 @@ include: "workflow/vct.smk"
 rule all:
     input: 
         get_overlay_outputs(),
-        get_all_outputs_vct()
+        get_all_outputs_vct(),
+        "rmd/theory.pdf"
+
+rule parental_imbalance_theory:
+    input:
+        rmd = "rmd/theory.Rmd"
+    output: 
+        html = "rmd/theory.pdf"
+    conda:
+        "workflow/envs/r-plink.yaml"
+    shell:
+        """
+        Rscript -e \"if (!tinytex::is_tinytex()) tinytex::install_tinytex()\"
+        Rscript -e \"rmarkdown::render('{input}', output_file='$(basename {output})', knit_root_dir=getwd(), clean=TRUE)\"
+        """
