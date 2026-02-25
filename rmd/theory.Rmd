@@ -10,6 +10,104 @@ output:
   pdf_document
 ---
 
+# Background
+Define the phenotype as
 $$
-\{text}{Var}(C) = \sum_i w_i b^2 = 
+P = A + C + \epsilon
 $$
+where $A$ is the additive genetic value, $C$ is the vertically culturally transmitted trait value, and $\epsilon$ is i.i.d. Gaussian noise. Var$(P)$ is normalized to 1, so $\text{Var}(A) = h^2$, $\text{Var}(C) = b^2$, and A$\text{Var}(\epsilon) = 1- h^2 - b^2$.
+
+In the original model, we assumed that $C$ for any given offspring would simply be the mean of the parental values:
+$$
+C_i = \frac{C_p + C_m}{2}
+$$
+However, this can be generalized to a weighted sum over both parents, where the father contributes variance
+$$
+b^2_p = wb^2
+$$
+and the mother
+$$
+b^2_m = (1-w)b^2
+$$
+Crucially, by the properties of ratios, this means that if $w = 0.75$, then the ratio of contributions will be
+$$
+\frac{b^2_p}{b^2_m} = \frac{w}{1-w} = (0.75)(0.25) = 3
+$$
+In the parental mean case where $w = 0.5 = 1 - w$:
+$$
+\frac{b^2_p}{b^2_m} = \frac{w}{1-w} = 1
+$$
+(John, I believe this is the point you were making at our meeting, but forgive me if I misinterpreted your words).
+
+The interesting empirical result is that the average phenotypic covariance $\text{Cov}(P_i, P_j)$ for a given $(h^2, b^2)$ parameter set appears to be higher as $w$ moves away from 0.5 and toward 0 or 1.
+
+# Theory
+Here I present a small derivation attempting to explain this result analytically.
+The VCT value for one individual:
+$$
+c_i = \sum_j^2 w_j c_j = wc_p + (1-w)c_m
+$$
+
+For siblings sharing parents:
+$$
+\begin{aligned}
+\text{Cov}(c_i, c_j)
+&= \text{Cov}\left(wc_p + (1-w)c_m + \epsilon_i, wc_p + (1-w)c_m + \epsilon_j\right) \\
+&= \text{Cov}\left(wc_p + (1-w)c_m, wc_p + (1-w)c_m\right) \\
+&= \text{Var}\left(wc_p + (1-w)c_m\right) \\
+&= w^2\text{Var} (c_p) + (1-w)^2\text{Var}(c_m) \\
+&= b^2(w^2 + (1-w)^2) \\
+\end{aligned}
+$$
+This is a polynomial $f(w)$ in $w$.
+
+The total phenotype correlation is
+$$
+\text{Cov}(P_i, P_j) = \text{Cov}(a_i, a_j) + \text{Cov}(c_i, c_j)
+$$ 
+$$
+\text{Cov}(a_i, a_j) = 2k_{ij}h^2
+$$
+where $k_{ij}$ is the kinship coefficient.
+
+Therefore:
+$$
+\text{Cov}(P_i, P_j) = 2k_{ij}h^2 + b^2(w^2 + (1-w)^2)
+$$ 
+$\text{Cov}(P_i, P_j)$ is therefore a second-degree polynomial $w$ with a minimum at $w = 0.5$, and with a minimum value and intercept determined by $k_{ij}$ and $h^2$.
+
+Initially, it would seem like this is also a full expression for phenotype covariance for arbitrary relatives, but I believe that the earlier assumption that $\text{Cov}(c_i, c_j) = \text{Var}(c_i)$ only holds for the case of sampling from the same parents, i.e. full siblings. In the more general case, we'd need an expression for the expected parental $c$ values given the distance between parent sets.
+
+```{r}
+phenotype_cov <- function(w, b2, k = 0.5, h2 = 0.2) {
+  return(2 * k * h2 + b2 * ((w^2) + (1 - w)^2)) 
+}
+
+w_vals <- seq(0, 1, length.out = 100)
+b2_vals <- seq(0, 0.8, by = 0.2)
+
+p_covariances_matrix <- sapply(
+  X = b2_vals,
+  FUN = phenotype_cov,
+  w = w_vals,
+  h2 = 0.2,
+  k = 0.5
+)
+
+colors <- c("black", "red", "blue", "purple", "lightblue")
+matplot(
+  x = w_vals,
+  y = p_covariances_matrix,
+  xlab = bquote(w),
+  ylab = bquote(Cov(P[i], P[j])),
+  col = colors,
+  type = "l",
+  lty = "solid",
+  lwd = 2
+)
+legend(
+  "top",
+  legend = paste("w =", b2_vals),
+  fill = colors
+)
+```
