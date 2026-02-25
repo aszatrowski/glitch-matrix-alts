@@ -19,7 +19,7 @@ where $A$ is the additive genetic value, $C$ is the vertically culturally transm
 
 In the original model, we assumed that $C$ for any given offspring would simply be the mean of the parental values:
 $$
-C_i = \frac{C_p + C_m}{2}
+C_i = \frac{C_p + C_m}{2} + \epsilon
 $$
 However, this can be generalized to a weighted sum over both parents, where the father contributes variance
 $$
