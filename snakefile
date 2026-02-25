@@ -1,10 +1,11 @@
 h2_VALUES = ["0.0001", "0.5", "1.0"]
-b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "0.9999"]
-parental_coef_VALUES = ["0.0", "0.25", "0.5", "0.75", "1.0"]
+b2_VALUES = ["0.5", "0.75", "0.9999"]
+parental_coef_VALUES = ["0.0", "0.5", "1.0"]
 
-N_REPLICATES = 25
-N_VARIANTS = 7.5e5
+N_REPLICATES = 5
+N_VARIANTS = 1e5
 N_CAUSAL_VARIANTS = N_VARIANTS - 1
+N_GENERATIONS = [1, 10, 20]
 
 localrules: parental_imbalance_theory
 
@@ -28,14 +29,17 @@ def get_all_outputs_vct():
     outputs = []
     for h2, b2 in get_valid_combinations():
         for parental_coef in get_valid_parental_coefs(b2):
-            outputs.append(f"figures/vct/h2_{h2}_b2_{b2}_pc_{parental_coef}_all.png")
+            for generations in N_GENERATIONS:
+                outputs.append(f"figures/vct/h2_{h2}_b2_{b2}_pc_{parental_coef}_gen_{generations}_all.png")
+                # outputs.append(f"figures/vct/h2_{h2}_b2_{b2}_pc_{parental_coef}_gen_{generations}_binned.png")
     return outputs
 
 def get_overlay_outputs():
     outputs = []
     for h2, b2 in get_valid_combinations():
         for parental_coef in get_valid_parental_coefs(b2):
-            outputs.append(f"figures/vct/b2_overlay/overlay_h2_{h2}_pc_{parental_coef}_binned.png")
+            for generations in N_GENERATIONS:
+                outputs.append(f"figures/vct/b2_overlay/overlay_h2_{h2}_pc_{parental_coef}_gen_{generations}_binned.png")
     return outputs
 
 include: "workflow/vct.smk"

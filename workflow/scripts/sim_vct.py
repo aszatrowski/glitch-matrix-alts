@@ -312,7 +312,7 @@ sim = xft.sim.Simulation(
 )
 
 # Run generations with timings
-num_generations = int(snakemake.params['generations'])
+num_generations = int(snakemake.wildcards['generations'])
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Running ' + str(num_generations) + ' generations...')
 sim.run(num_generations)
@@ -322,7 +322,9 @@ print('[' + str(now) + ']' + ' Complete.')
 # Write genotypes to plink format for GRM computation with timings
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Writing to plink format...')
-xft.io.write_to_plink1(sim.haplotypes, f"data/vct/plink/h2_{h2}_b2_{b2}_pc_{parental_coef}_rep{rep}_plink")
+arch = snakemake.wildcards.get('arch', arch)
+gen = snakemake.wildcards.get('generations', num_generations)
+xft.io.write_to_plink1(sim.haplotypes, f"data/{arch}/plink/h2_{h2}_b2_{b2}_pc_{parental_coef}_gen_{gen}_rep{rep}_plink")
 now = datetime.datetime.now()
 print('[' + str(now) + ']' + ' Complete.')
 
