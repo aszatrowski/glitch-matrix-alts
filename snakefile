@@ -48,13 +48,13 @@ rule all:
     input: 
         get_overlay_outputs(),
         get_all_outputs_vct(),
-        "rmd/theory.pdf"
+        "export/theory.pdf"
 
 rule parental_imbalance_theory:
     input:
-        rmd = "rmd/theory.Rmd"
+        rmd = "export/theory.Rmd"
     output: 
-        html = "rmd/theory.pdf"
+        html = "export/theory.pdf"
     conda:
         "workflow/envs/r-plink.yaml"
     shell:
