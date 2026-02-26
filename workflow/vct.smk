@@ -14,7 +14,7 @@ rule sim_vct:
         "logs/{arch}/h2_{h2}_b2_{b2}_pc_{parental_coef}_gen_{generations}_rep{rep}.log"
     resources:
         mem = "48G",
-        runtime = 20
+        runtime = 30
     conda: "envs/xftsim.yaml"
     script: "scripts/sim_vct.py" 
 
@@ -31,7 +31,8 @@ rule plink_compute_grm:
         ))
     resources:
         mem = "8G",
-        runtime = 5
+        runtime = 5,
+        slurm_partition = "jnovembre"
     threads: 8
     params:
         min_af = 0.01
@@ -58,24 +59,10 @@ rule merge_replicates:
         generations = lambda wildcards: int(wildcards.generations)
     resources:
         mem = "32G",
-        runtime = 5 
+        runtime = 10 
     threads: 2
     conda: "envs/r-plink.yaml"
     script: "scripts/merge_replicates.R"
-
-rule plot_pheno_covariance_binned:
-    input: 
-        covariances_csv = "data/{arch}/h2_{h2}_b2_{b2}_pc_{parental_coef}_gen_{generations}_covmatrix_merged.parquet"
-    output: 
-        covariance_plot = "figures/{arch}/h2_{h2}_b2_{b2}_pc_{parental_coef}_gen_{generations}_binned.png",
-    params:
-        binwidth = 0.01,
-        min_obs_in_bin = 20
-    resources:
-        mem = "16G",
-        runtime = 5 
-    conda: "envs/r-plink.yaml"
-    script: "scripts/plot_covariance_binned.R"
 
 rule plot_pheno_covariance_all:
     input: 

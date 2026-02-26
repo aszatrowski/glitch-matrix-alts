@@ -66,6 +66,7 @@ p <- ggplot(binned_dt, aes(x = genotype_covariance, y = phenotype_covariance, co
     subtitle = bquote(paste("arch:" ~ .(arch), ", ", h^2 == .(h2_val) ~ c[m] == .(parental_coef))),
     caption = paste(
       "Replicates:", snakemake@params$replicates,
+      "| Gens:", snakemake@wildcards$generations,
       "| Variants:", snakemake@params$m_variants,
       "| Causal:", snakemake@params$n_causal
     ),

@@ -8,7 +8,7 @@ arch <- snakemake@wildcards$arch
 he_regression <- lm(phenotype_covariance ~ genotype_covariance, data = cov_df)
 he_est <- round(coef(he_regression)[2], 3)
 parental_coef <- snakemake@wildcards$parental_coef
-title_text <- bquote(h^2 == .(snakemake@wildcards$h2) ~ b^2 == .(snakemake@wildcards$b2) ~ c[m] == .(parental_coef))
+title_text <- bquote(h^2 == .(snakemake@wildcards$h2) ~ b^2 == .(snakemake@wildcards$b2) ~ w[m] == .(parental_coef))
 
 p <- ggplot(cov_df, aes(x = genotype_covariance, y = phenotype_covariance)) +
   stat_bin2d(bins = 40, aes(fill = after_stat(log10(count)))) +
@@ -21,6 +21,7 @@ p <- ggplot(cov_df, aes(x = genotype_covariance, y = phenotype_covariance)) +
     ),
     caption = paste(
       "Replicates:", snakemake@params$replicates,
+      "| Gens:", snakemake@wildcards$generations,
       "| Variants:", snakemake@params$m_variants,
       "| Causal:", snakemake@params$n_causal
     ),

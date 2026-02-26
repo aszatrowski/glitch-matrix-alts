@@ -1,11 +1,11 @@
 h2_VALUES = ["0.0001", "0.5", "1.0"]
-b2_VALUES = ["0.5", "0.75", "0.9999"]
+b2_VALUES = ["0.0", "0.25", "0.5", "0.75", "0.9999"]
 parental_coef_VALUES = ["0.0", "0.5", "1.0"]
 
 N_REPLICATES = 5
-N_VARIANTS = 1e5
+N_VARIANTS = 5e5
 N_CAUSAL_VARIANTS = N_VARIANTS - 1
-N_GENERATIONS = [1, 10, 20]
+N_GENERATIONS = [2, 5, 10, 20]
 
 localrules: parental_imbalance_theory
 
