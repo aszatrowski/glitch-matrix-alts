@@ -13,10 +13,11 @@ rule parental_imbalance_theory:
 
 rule pptx:
     input: 
-        "figures/vct/h2_0.0001_b2_0.0_pc_0.5_gen_2_all.png",
-        "figures/vct/h2_0.0001_b2_0.0_pc_0.5_gen_10_all.png",
+        "figures/vct/b2_overlay/overlay_h2_0.0001_pc_1.0_gen_5_binned.png",
+        "figures/vct/b2_overlay/overlay_h2_0.0001_pc_1.0_gen_10_binned.png",
+        "figures/vct/b2_overlay/overlay_h2_0.0001_pc_1.0_gen_20_binned.png",
     output: 
-        "export/results.pptx"
+        pptx = "export/results.pptx"
     conda:
         "envs/render.yaml"
     script: 

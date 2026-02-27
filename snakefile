@@ -1,11 +1,11 @@
-h2_VALUES = ["0.0001", "0.5", "1.0"]
+h2_VALUES = ["0.0001", "0.25", "1.0"]
 b2_VALUES = ["0.0", "0.5", "0.75", "0.9999"]
 parental_coef_VALUES = ["0.0", "0.5", "1.0"]
 
-N_REPLICATES = 10
+N_REPLICATES = 20
 N_VARIANTS = 5e5
 N_CAUSAL_VARIANTS = N_VARIANTS - 1
-N_GENERATIONS = [2, 5, 10, 20]
+N_GENERATIONS = [2, 5, 10, 20, 50]
 
 localrules: parental_imbalance_theory, pptx
 
@@ -49,4 +49,5 @@ rule all:
     input: 
         get_overlay_outputs(),
         get_all_outputs_vct(),
-        "export/theory.pdf"
+        "export/theory.pdf",
+        "export/results.pptx"
