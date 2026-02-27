@@ -1,4 +1,4 @@
-name: r-plink
+name: render
 channels:
   - conda-forge
   - bioconda
@@ -6,8 +6,5 @@ channels:
 dependencies:
   - r-base=4.3
   - r-tidyverse
-  - r-arrow
-  - r-data.table
   - r-tinytex
-  - plink2
   - python-pptx
